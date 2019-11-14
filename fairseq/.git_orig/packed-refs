@@ -1,0 +1,23 @@
+# pack-refs with: peeled fully-peeled sorted 
+dd933d92301d23b9fc33827dda1f761230477a97 refs/remotes/origin/asr_ctc_loss
+7c6634dc8540cc9df6a611a119ad664521625630 refs/remotes/origin/benchmark
+338183639a36b64260336fcb0d24bab71c2102b9 refs/remotes/origin/benchmark2
+70b02caf633ef9041b033941bd90306c36cdc5b7 refs/remotes/origin/bi_trans_lm
+4634c3f14b9fb311b059586178beb97bdeb4e7cb refs/remotes/origin/blockbert
+23adb0c110fdd5e9166b3939987c5d26df996ec3 refs/remotes/origin/classic_seqlevel
+acfeaf80869d12b3e86354b372714f25ecc85279 refs/remotes/origin/fix_docs
+e26ee47a8c16a299d2304226dc4e5a6a43827db2 refs/remotes/origin/master
+20bbbdc068dabef1a3a4689dd5a9ccffcc8297c5 refs/remotes/origin/naive_beamsearch
+38efed65bf6a9d17ca2e2e68a3a3e3800fe883c5 refs/remotes/origin/readme
+61d10100326130d2eceee85167d5ec2d9970ebbe refs/remotes/origin/seq_task
+d82945d1832f0a1c75d0e3d12fb6dfb9d6c96a79 refs/tags/v0.3.0
+^7e86e30cc5b97db30403b738de2dbbb55f06a92b
+ec0031df7b2c7d583b13efaffbb7a2f03e87378c refs/tags/v0.4.0
+388c520be21752cacb9fe3b1712038f32e0e9a5f refs/tags/v0.5.0
+864b89d044ffdd33f13802af20da8714bf2855f5 refs/tags/v0.6.0
+fbd4cef9a575b5f77ca05d4b7c3ad3adb11141ac refs/tags/v0.6.1
+e6422528dae0b899848469efe2dc404c1e639ce9 refs/tags/v0.6.2
+bd710e75aecb5f1dd8fdd6e2a947d6aeebe45258 refs/tags/v0.7.0
+881381cfc7cf5006712181138ff5b0811052cc57 refs/tags/v0.7.1
+b002d0096ea82c77be7027b205d0b29de82edde4 refs/tags/v0.7.2
+ffffe04ea12679bdc12fbbafdc6406dd3e6c9943 refs/tags/v0.8.0
