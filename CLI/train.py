@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
-
+from os import path
+fairseq_path = path.abspath(path.join(path.abspath(__file__), '../../fairseq'))
+sys.path.insert(0, fairseq_path)
 from fairseq_cli.train import cli_main
 
 if __name__ == '__main__':

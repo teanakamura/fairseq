@@ -4,7 +4,16 @@ https://arxiv.org/abs/1907.11692
 
 ## Introduction
 
-**RoBERTa** iterates on BERT's pretraining procedure, including training the model longer, with bigger batches over more data; removing the next sentence prediction objective; training on longer sequences; and dynamically changing the masking pattern applied to the training data. See the associated paper for more details.
+RoBERTa iterates on BERT's pretraining procedure, including training the model longer, with bigger batches over more data; removing the next sentence prediction objective; training on longer sequences; and dynamically changing the masking pattern applied to the training data. See the associated paper for more details.
+
+### What's New:
+
+- November 2019: French model (CamemBERT) is available [CamemBERT](https://github.com/pytorch/fairseq/tree/master/examples/camembert).
+- November 2019: Multilingual encoder (XLM-RoBERTa) is available [XLM-R](https://github.com/pytorch/fairseq/tree/master/examples/xlmr).
+- September 2019: TensorFlow and TPU support via the [transformers library](https://github.com/huggingface/transformers).
+- August 2019: RoBERTa is now supported in the [pytorch-transformers library](https://github.com/huggingface/pytorch-transformers).
+- August 2019: Added [tutorial for finetuning on WinoGrande](https://github.com/pytorch/fairseq/tree/master/examples/roberta/wsc#roberta-training-on-winogrande-dataset).
+- August 2019: Added [tutorial for pretraining RoBERTa using your own data](README.pretraining.md).
 
 ## Pre-trained models
 
@@ -13,11 +22,12 @@ Model | Description | # params | Download
 `roberta.base` | RoBERTa using the BERT-base architecture | 125M | [roberta.base.tar.gz](https://dl.fbaipublicfiles.com/fairseq/models/roberta.base.tar.gz)
 `roberta.large` | RoBERTa using the BERT-large architecture | 355M | [roberta.large.tar.gz](https://dl.fbaipublicfiles.com/fairseq/models/roberta.large.tar.gz)
 `roberta.large.mnli` | `roberta.large` finetuned on [MNLI](http://www.nyu.edu/projects/bowman/multinli) | 355M | [roberta.large.mnli.tar.gz](https://dl.fbaipublicfiles.com/fairseq/models/roberta.large.mnli.tar.gz)
-`roberta.large.wsc` | `roberta.large` finetuned on [WSC](https://cs.nyu.edu/faculty/davise/papers/WinogradSchemas/WS.html) | 355M | [roberta.large.wsc.tar.gz](https://dl.fbaipublicfiles.com/fairseq/models/roberta.large.wsc.tar.gz)
+`roberta.large.wsc` | `roberta.large` finetuned on [WSC](wsc/README.md) | 355M | [roberta.large.wsc.tar.gz](https://dl.fbaipublicfiles.com/fairseq/models/roberta.large.wsc.tar.gz)
 
 ## Results
 
-##### Results on GLUE tasks (dev set, single model, single-task finetuning)
+**[GLUE (Wang et al., 2019)](https://gluebenchmark.com/)**
+_(dev set, single model, single-task finetuning)_
 
 Model | MNLI | QNLI | QQP | RTE | SST-2 | MRPC | CoLA | STS-B
 ---|---|---|---|---|---|---|---|---
@@ -25,24 +35,56 @@ Model | MNLI | QNLI | QQP | RTE | SST-2 | MRPC | CoLA | STS-B
 `roberta.large` | 90.2 | 94.7 | 92.2 | 86.6 | 96.4 | 90.9 | 68.0 | 92.4
 `roberta.large.mnli` | 90.2 | - | - | - | - | - | - | -
 
-##### Results on SuperGLUE tasks (dev set, single model, single-task finetuning)
+**[SuperGLUE (Wang et al., 2019)](https://super.gluebenchmark.com/)**
+_(dev set, single model, single-task finetuning)_
 
 Model | BoolQ | CB | COPA | MultiRC | RTE | WiC | WSC
 ---|---|---|---|---|---|---|---
 `roberta.large` | 86.9 | 98.2 | 94.0 | 85.7 | 89.5 | 75.6 | -
 `roberta.large.wsc` | - | - | - | - | - | - | 91.3
 
-##### Results on SQuAD (dev set)
+**[SQuAD (Rajpurkar et al., 2018)](https://rajpurkar.github.io/SQuAD-explorer/)**
+_(dev set, no additional data used)_
 
 Model | SQuAD 1.1 EM/F1 | SQuAD 2.0 EM/F1
 ---|---|---
 `roberta.large` | 88.9/94.6 | 86.5/89.4
 
-##### Results on Reading Comprehension (RACE, test set)
+**[RACE (Lai et al., 2017)](http://www.qizhexie.com/data/RACE_leaderboard.html)**
+_(test set)_
 
 Model | Accuracy | Middle | High
 ---|---|---|---
 `roberta.large` | 83.2 | 86.5 | 81.3
+
+**[HellaSwag (Zellers et al., 2019)](https://rowanzellers.com/hellaswag/)**
+_(test set)_
+
+Model | Overall | In-domain | Zero-shot | ActivityNet | WikiHow
+---|---|---|---|---|---
+`roberta.large` | 85.2 | 87.3 | 83.1 | 74.6 | 90.9
+
+**[Commonsense QA (Talmor et al., 2019)](https://www.tau-nlp.org/commonsenseqa)**
+_(test set)_
+
+Model | Accuracy
+---|---
+`roberta.large` (single model) | 72.1
+`roberta.large` (ensemble) | 72.5
+
+**[Winogrande (Sakaguchi et al., 2019)](https://arxiv.org/abs/1907.10641)**
+_(test set)_
+
+Model | Accuracy
+---|---
+`roberta.large` | 78.1
+
+**[XNLI (Conneau et al., 2018)](https://arxiv.org/abs/1809.05053)**
+_(TRANSLATE-TEST)_
+
+Model | en | fr | es | de | el | bg | ru | tr | ar | vi | th | zh | hi | sw | ur
+---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---
+`roberta.large.mnli` | 91.3 | 82.91 | 84.27 | 81.24 | 81.74 | 83.13 | 78.28 | 76.79 | 76.64 | 74.17 | 74.05 | 77.5 | 70.9 | 66.65 | 66.81
 
 ## Example usage
 
@@ -53,7 +95,7 @@ roberta = torch.hub.load('pytorch/fairseq', 'roberta.large')
 roberta.eval()  # disable dropout (or leave in train mode to finetune)
 ```
 
-##### Load RoBERTa (for PyTorch 1.0):
+##### Load RoBERTa (for PyTorch 1.0 or custom models):
 ```python
 # Download roberta.large model
 wget https://dl.fbaipublicfiles.com/fairseq/models/roberta.large.tar.gz
@@ -61,7 +103,7 @@ tar -xzvf roberta.large.tar.gz
 
 # Load the model in fairseq
 from fairseq.models.roberta import RobertaModel
-roberta = RobertaModel.from_pretrained('/path/to/roberta.large')
+roberta = RobertaModel.from_pretrained('/path/to/roberta.large', checkpoint_file='model.pt')
 roberta.eval()  # disable dropout (or leave in train mode to finetune)
 ```
 
@@ -107,11 +149,26 @@ logprobs = roberta.predict('new_task', tokens)  # tensor([[-1.1050, -1.0672, -1.
 
 ##### Batched prediction:
 ```python
+import torch
 from fairseq.data.data_utils import collate_tokens
-sentences = ['Hello world.', 'Another unrelated sentence.']
-batch = collate_tokens([roberta.encode(sent) for sent in sentences], pad_idx=1)
-logprobs = roberta.predict('new_task', batch)
-assert logprobs.size() == torch.Size([2, 3])
+
+roberta = torch.hub.load('pytorch/fairseq', 'roberta.large.mnli')
+roberta.eval()
+
+batch_of_pairs = [
+    ['Roberta is a heavily optimized version of BERT.', 'Roberta is not very optimized.'],
+    ['Roberta is a heavily optimized version of BERT.', 'Roberta is based on BERT.'],
+    ['potatoes are awesome.', 'I like to run.'],
+    ['Mars is very far from earth.', 'Mars is very close.'],
+]
+
+batch = collate_tokens(
+    [roberta.encode(pair[0], pair[1]) for pair in batch_of_pairs], pad_idx=1
+)
+
+logprobs = roberta.predict('mnli', batch)
+print(logprobs.argmax(dim=1))
+# tensor([0, 2, 1, 0])
 ```
 
 ##### Using the GPU:
@@ -128,13 +185,13 @@ RoBERTa can be used to fill `<mask>` tokens in the input. Some examples from the
 [Natural Questions dataset](https://ai.google.com/research/NaturalQuestions/):
 ```python
 roberta.fill_mask('The first Star wars movie came out in <mask>', topk=3)
-# [('The first Star wars movie came out in 1977', 0.9504712224006653), ('The first Star wars movie came out in 1978', 0.009986752644181252), ('The first Star wars movie came out in 1979', 0.00957468245178461)]
+# [('The first Star wars movie came out in 1977', 0.9504708051681519, ' 1977'), ('The first Star wars movie came out in 1978', 0.009986862540245056, ' 1978'), ('The first Star wars movie came out in 1979', 0.009574787691235542, ' 1979')]
 
 roberta.fill_mask('Vikram samvat calender is official in <mask>', topk=3)
-# [('Vikram samvat calender is official in India', 0.21878768503665924), ('Vikram samvat calender is official in Delhi', 0.08547217398881912), ('Vikram samvat calender is official in Gujarat', 0.07556255906820297)]
+# [('Vikram samvat calender is official in India', 0.21878819167613983, ' India'), ('Vikram samvat calender is official in Delhi', 0.08547237515449524, ' Delhi'), ('Vikram samvat calender is official in Gujarat', 0.07556215673685074, ' Gujarat')]
 
 roberta.fill_mask('<mask> is the common currency of the European Union', topk=3)
-# [('Euro is the common currency of the European Union', 0.945650577545166), ('euro is the common currency of the European Union', 0.025747718289494514), ('€ is the common currency of the European Union', 0.011183015070855618)]
+# [('Euro is the common currency of the European Union', 0.9456493854522705, 'Euro'), ('euro is the common currency of the European Union', 0.025748178362846375, 'euro'), ('€ is the common currency of the European Union', 0.011183084920048714, '€')]
 ```
 
 #### Pronoun disambiguation (Winograd Schema Challenge):
@@ -164,7 +221,7 @@ roberta.disambiguate_pronoun('The city councilmen refused the demonstrators a pe
 # 'demonstrators'
 ```
 
-See the [RoBERTA Winograd Schema Challenge (WSC) README](README.wsc.md) for more details on how to train this model.
+See the [RoBERTA Winograd Schema Challenge (WSC) README](wsc/README.md) for more details on how to train this model.
 
 #### Extract features aligned to words:
 
@@ -212,22 +269,17 @@ print('| Accuracy: ', float(ncorrect)/float(nsamples))
 # Expected output: 0.9060
 ```
 
-
 ## Finetuning
 
 - [Finetuning on GLUE](README.glue.md)
 - [Finetuning on custom classification tasks (e.g., IMDB)](README.custom_classification.md)
-- [Finetuning on Winograd Schema Challenge (WSC)](README.wsc.md)
-- [Finetuning on Commonsense QA (CQA)](README.cqa.md)
+- [Finetuning on Winograd Schema Challenge (WSC)](wsc/README.md)
+- [Finetuning on Commonsense QA (CQA)](commonsense_qa/README.md)
 - Finetuning on SQuAD: coming soon
 
 ## Pretraining using your own data
 
-You can use the [`masked_lm` task](/fairseq/tasks/masked_lm.py) to pretrain RoBERTa from scratch, or to continue pretraining RoBERTa starting from one of the released checkpoints.
-
-Data should be preprocessed following the [language modeling example](/examples/language_model).
-
-A more detailed tutorial is coming soon.
+See the [tutorial for pretraining RoBERTa using your own data](README.pretraining.md).
 
 ## Citation
 

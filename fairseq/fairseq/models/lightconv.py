@@ -19,10 +19,10 @@ from fairseq.models import (
 )
 from fairseq.modules import (
     AdaptiveSoftmax,
-    DynamicConv1dTBC,
+    DynamicConv,
     LayerNorm,
     PositionalEmbedding,
-    LightweightConv1dTBC,
+    LightweightConv,
     MultiheadAttention,
 )
 
@@ -447,15 +447,15 @@ class LightConvEncoderLayer(nn.Module):
             self.linear1 = Linear(self.embed_dim, self.conv_dim)
             self.act = None
         if args.encoder_conv_type == 'lightweight':
-            self.conv = LightweightConv1dTBC(self.conv_dim, kernel_size, padding_l=padding_l,
-                                             weight_softmax=args.weight_softmax,
-                                             num_heads=args.encoder_attention_heads,
-                                             weight_dropout=args.weight_dropout)
+            self.conv = LightweightConv(self.conv_dim, kernel_size, padding_l=padding_l,
+                                        weight_softmax=args.weight_softmax,
+                                        num_heads=args.encoder_attention_heads,
+                                        weight_dropout=args.weight_dropout)
         elif args.encoder_conv_type == 'dynamic':
-            self.conv = DynamicConv1dTBC(self.conv_dim, kernel_size, padding_l=padding_l,
-                                         weight_softmax=args.weight_softmax,
-                                         num_heads=args.encoder_attention_heads,
-                                         weight_dropout=args.weight_dropout)
+            self.conv = DynamicConv(self.conv_dim, kernel_size, padding_l=padding_l,
+                                    weight_softmax=args.weight_softmax,
+                                    num_heads=args.encoder_attention_heads,
+                                    weight_dropout=args.weight_dropout)
         else:
             raise NotImplementedError
         self.linear2 = Linear(self.conv_dim, self.embed_dim)
@@ -535,15 +535,15 @@ class LightConvDecoderLayer(nn.Module):
             self.linear1 = Linear(self.embed_dim, self.conv_dim)
             self.act = None
         if args.decoder_conv_type == 'lightweight':
-            self.conv = LightweightConv1dTBC(self.conv_dim, kernel_size, padding_l=kernel_size-1,
-                                             weight_softmax=args.weight_softmax,
-                                             num_heads=args.decoder_attention_heads,
-                                             weight_dropout=args.weight_dropout)
+            self.conv = LightweightConv(self.conv_dim, kernel_size, padding_l=kernel_size-1,
+                                        weight_softmax=args.weight_softmax,
+                                        num_heads=args.decoder_attention_heads,
+                                        weight_dropout=args.weight_dropout)
         elif args.decoder_conv_type == 'dynamic':
-            self.conv = DynamicConv1dTBC(self.conv_dim, kernel_size, padding_l=kernel_size-1,
-                                         weight_softmax=args.weight_softmax,
-                                         num_heads=args.decoder_attention_heads,
-                                         weight_dropout=args.weight_dropout)
+            self.conv = DynamicConv(self.conv_dim, kernel_size, padding_l=kernel_size-1,
+                                    weight_softmax=args.weight_softmax,
+                                    num_heads=args.decoder_attention_heads,
+                                    weight_dropout=args.weight_dropout)
         else:
             raise NotImplementedError
         self.linear2 = Linear(self.conv_dim, self.embed_dim)

@@ -1,8 +1,8 @@
 import re
 import sys
-import os
 from os import path
-sys.path.insert(0, path.join(path.dirname(os.getcwd()), 'fairseq'))
+fairseq_path = path.abspath(path.join(path.abspath(__file__), '../../fairseq'))
+sys.path.insert(0, fairseq_path)
 from fairseq_cli.preprocess import cli_main
 
 if __name__ == '__main__':

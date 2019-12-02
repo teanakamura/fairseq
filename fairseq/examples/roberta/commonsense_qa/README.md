@@ -1,6 +1,6 @@
 # Finetuning RoBERTa on Commonsense QA
 
-We follow a similar approach to [finetuning RACE](README.race.md). Specifically
+We follow a similar approach to [finetuning RACE](../README.race.md). Specifically
 for each question we construct five inputs, one for each of the five candidate
 answer choices. Each input is constructed by concatenating the question and
 candidate answer. We then encode each input and pass the resulting "[CLS]"
@@ -8,7 +8,7 @@ representations through a fully-connected layer to predict the correct answer.
 We train with a standard cross-entropy loss.
 
 We also found it helpful to prepend a prefix of `Q:` to the question and `A:` to
-the input. The complete input format is:
+the answer. The complete input format is:
 ```
 <s> Q: Where would I not want a fox? </s> A: hen house </s>
 ```
@@ -18,7 +18,7 @@ Our final submission is based on a hyperparameter search over the learning rate
 4000) and random seed. We selected the model with the best performance on the
 development set after 100 trials.
 
-### 1) Download the data from Commonsense QA website (https://www.tau-nlp.org/commonsenseqa)
+### 1) Download data from the Commonsense QA website (https://www.tau-nlp.org/commonsenseqa)
 ```bash
 bash examples/roberta/commonsense_qa/download_cqa_data.sh
 ```
@@ -39,7 +39,7 @@ DATA_DIR=data/CommonsenseQA
 FAIRSEQ_PATH=/path/to/fairseq
 FAIRSEQ_USER_DIR=${FAIRSEQ_PATH}/examples/roberta/commonsense_qa
 
-CUDA_VISIBLE_DEVICES=0 fairseq-train --fp16 \
+CUDA_VISIBLE_DEVICES=0 fairseq-train --fp16 --ddp-backend=no_c10d \
     $DATA_DIR \
     --user-dir $FAIRSEQ_USER_DIR \
     --restore-file $ROBERTA_PATH \
@@ -51,7 +51,7 @@ CUDA_VISIBLE_DEVICES=0 fairseq-train --fp16 \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --criterion sentence_ranking --num-classes 5 \
     --optimizer adam --adam-betas '(0.9, 0.98)' --adam-eps 1e-06 --clip-norm 0.0 \
-    --lr-scheduler polynomial_decay --lr $LR
+    --lr-scheduler polynomial_decay --lr $LR \
     --warmup-updates $WARMUP_UPDATES --total-num-update $MAX_UPDATES \
     --max-sentences $MAX_SENTENCES \
     --max-update $MAX_UPDATES \

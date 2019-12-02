@@ -9,13 +9,13 @@ from .beamable_mm import BeamableMM
 from .character_token_embedder import CharacterTokenEmbedder
 from .conv_tbc import ConvTBC
 from .downsampled_multihead_attention import DownsampledMultiHeadAttention
-from .dynamic_convolution import DynamicConv1dTBC
+from .dynamic_convolution import DynamicConv, DynamicConv1dTBC
 from .gelu import gelu, gelu_accurate
 from .grad_multiply import GradMultiply
 from .highway import Highway
 from .layer_norm import LayerNorm
 from .learned_positional_embedding import LearnedPositionalEmbedding
-from .lightweight_convolution import LightweightConv1dTBC
+from .lightweight_convolution import LightweightConv, LightweightConv1dTBC
 from .linearized_convolution import LinearizedConvolution
 from .logsumexp_moe import LogSumExpMoE
 from .mean_pool_gating_network import MeanPoolGatingNetwork
@@ -37,6 +37,7 @@ __all__ = [
     'ConvTBC',
     'DownsampledMultiHeadAttention',
     'DynamicConv1dTBC',
+    'DynamicConv',
     'gelu',
     'gelu_accurate',
     'GradMultiply',
@@ -44,6 +45,7 @@ __all__ = [
     'LayerNorm',
     'LearnedPositionalEmbedding',
     'LightweightConv1dTBC',
+    'LightweightConv',
     'LinearizedConvolution',
     'LogSumExpMoE',
     'MeanPoolGatingNetwork',

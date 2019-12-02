@@ -1,0 +1,7 @@
+9398a2829596393b73f5c5f1b99edf4c2d8f9316		branch 'master' of https://github.com/pytorch/fairseq
+70b02caf633ef9041b033941bd90306c36cdc5b7	not-for-merge	branch 'bi_trans_lm' of https://github.com/pytorch/fairseq
+4634c3f14b9fb311b059586178beb97bdeb4e7cb	not-for-merge	branch 'blockbert' of https://github.com/pytorch/fairseq
+23adb0c110fdd5e9166b3939987c5d26df996ec3	not-for-merge	branch 'classic_seqlevel' of https://github.com/pytorch/fairseq
+20bbbdc068dabef1a3a4689dd5a9ccffcc8297c5	not-for-merge	branch 'naive_beamsearch' of https://github.com/pytorch/fairseq
+61d10100326130d2eceee85167d5ec2d9970ebbe	not-for-merge	branch 'seq_task' of https://github.com/pytorch/fairseq
+bdf09e1321a77252835550e84d73ad1bb3f3173c	not-for-merge	branch 'xlmr_benchmark' of https://github.com/pytorch/fairseq

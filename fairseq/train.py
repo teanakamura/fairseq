@@ -11,6 +11,7 @@ import collections
 import math
 import random
 
+import numpy as np
 import torch
 
 from fairseq import checkpoint_utils, distributed_utils, options, progress_bar, tasks, utils
@@ -28,6 +29,7 @@ def main(args, init_distributed=False):
     # Initialize CUDA and distributed training
     if torch.cuda.is_available() and not args.cpu:
         torch.cuda.set_device(args.device_id)
+    np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     if init_distributed:
         args.distributed_rank = distributed_utils.distributed_init(args)
@@ -73,9 +75,13 @@ def main(args, init_distributed=False):
     lr = trainer.get_lr()
     train_meter = StopwatchMeter()
     train_meter.start()
-    valid_losses = [None]
     valid_subsets = args.valid_subset.split(',')
-    while lr > args.min_lr and epoch_itr.epoch < max_epoch and trainer.get_num_updates() < max_update:
+    while (
+        lr > args.min_lr
+        and (epoch_itr.epoch < max_epoch or (epoch_itr.epoch == max_epoch
+            and epoch_itr._next_epoch_itr is not None))
+        and trainer.get_num_updates() < max_update
+    ):
         # train for one epoch
         train(args, trainer, task, epoch_itr)
 
@@ -91,9 +97,9 @@ def main(args, init_distributed=False):
         if epoch_itr.epoch % args.save_interval == 0:
             checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
 
-        if ':' in getattr(args, 'data', ''):
-            # sharded data: get train iterator for next epoch
-            epoch_itr = trainer.get_train_iterator(epoch_itr.epoch)
+        reload_dataset = ':' in getattr(args, 'data', '')
+        # sharded data: get train iterator for next epoch
+        epoch_itr = trainer.get_train_iterator(epoch_itr.epoch, load_dataset=reload_dataset)
     train_meter.stop()
     print('| done training in {:.1f} seconds'.format(train_meter.sum))
 
@@ -134,9 +140,10 @@ def train(args, trainer, task, epoch_itr):
             stats[k] = extra_meters[k].avg
         progress.log(stats, tag='train', step=stats['num_updates'])
 
-        # ignore the first mini-batch in words-per-second calculation
+        # ignore the first mini-batch in words-per-second and updates-per-second calculation
         if i == 0:
             trainer.get_meter('wps').reset()
+            trainer.get_meter('ups').reset()
 
         num_updates = trainer.get_num_updates()
         if (
@@ -193,6 +200,11 @@ def get_training_stats(trainer):
 
 def validate(args, trainer, task, epoch_itr, subsets):
     """Evaluate the model on the validation set(s) and return the losses."""
+
+    if args.fixed_validation_seed is not None:
+        # set fixed seed for every validation
+        utils.set_torch_seed(args.fixed_validation_seed)
+
     valid_losses = []
     for subset in subsets:
         # Initialize data iterator

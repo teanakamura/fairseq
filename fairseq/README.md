@@ -6,10 +6,14 @@ modeling and other text generation tasks.
 
 ### What's New:
 
+- November 2019: [CamemBERT model and code released](examples/camembert/README.md)
+- November 2019: [BART model and code released](examples/bart/README.md)
+- November 2019: [XLM-R models and code released](examples/xlmr/README.md)
+- September 2019: [Nonautoregressive translation code released](examples/nonautoregressive_translation/README.md)
+- August 2019: [WMT'19 models released](examples/wmt19/README.md)
 - July 2019: fairseq relicensed under MIT license
-- July 2019: [RoBERTa models and code release](examples/roberta/README.md)
-- June 2019: [wav2vec models and code release](examples/wav2vec/README.md)
-- April 2019: [fairseq demo paper @ NAACL 2019](https://arxiv.org/abs/1904.01038)
+- July 2019: [RoBERTa models and code released](examples/roberta/README.md)
+- June 2019: [wav2vec models and code released](examples/wav2vec/README.md)
 
 ### Features:
 
@@ -31,6 +35,15 @@ Fairseq provides reference implementations of various sequence-to-sequence model
   - [Adaptive Input Representations for Neural Language Modeling (Baevski and Auli, 2018)](examples/language_model/transformer_lm/README.md)
   - [Mixture Models for Diverse Machine Translation: Tricks of the Trade (Shen et al., 2019)](examples/translation_moe/README.md)
   - [RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)](examples/roberta/README.md)
+  - [Facebook FAIR's WMT19 News Translation Task Submission (Ng et al., 2019)](examples/wmt19/README.md)
+  - [Jointly Learning to Align and Translate with Transformer Models (Garg et al., 2019)](examples/joint_alignment_translation/README.md )
+- **Non-autoregressive Transformers**
+  - Non-Autoregressive Neural Machine Translation (Gu et al., 2017)
+  - Deterministic Non-Autoregressive Neural Sequence Modeling by Iterative Refinement (Lee et al. 2018)
+  - Insertion Transformer: Flexible Sequence Generation via Insertion Operations (Stern et al. 2019)
+  - Mask-Predict: Parallel Decoding of Conditional Masked Language Models (Ghazvininejad et al., 2019)
+  - [Levenshtein Transformer (Gu et al., 2019)](examples/nonautoregressive_translation/README.md)
+
 
 **Additionally:**
 - multi-GPU (distributed) training on one machine or across multiple machines
@@ -42,44 +55,46 @@ Fairseq provides reference implementations of various sequence-to-sequence model
 - mixed precision training (trains faster with less GPU memory on [NVIDIA tensor cores](https://developer.nvidia.com/tensor-cores))
 - extensible: easily register new models, criterions, tasks, optimizers and learning rate schedulers
 
-We also provide [pre-trained models](#pre-trained-models-and-examples) for several benchmark
-translation and language modeling datasets.
+We also provide [pre-trained models for translation and language modeling](#pre-trained-models-and-examples)
+with a convenient `torch.hub` interface:
+```python
+en2de = torch.hub.load('pytorch/fairseq', 'transformer.wmt19.en-de.single_model')
+en2de.translate('Hello world', beam=5)
+# 'Hallo Welt'
+```
+See the PyTorch Hub tutorials for [translation](https://pytorch.org/hub/pytorch_fairseq_translation/)
+and [RoBERTa](https://pytorch.org/hub/pytorch_fairseq_roberta/) for more examples.
 
 ![Model](fairseq.gif)
 
 # Requirements and Installation
 
-* [PyTorch](http://pytorch.org/) version >= 1.0.0
+* [PyTorch](http://pytorch.org/) version >= 1.2.0
 * Python version >= 3.5
 * For training new models, you'll also need an NVIDIA GPU and [NCCL](https://github.com/NVIDIA/nccl)
+* **For faster training** install NVIDIA's [apex](https://github.com/NVIDIA/apex) library with the `--cuda_ext` option
 
-Please follow the instructions here to install PyTorch: https://github.com/pytorch/pytorch#installation.
+To install fairseq:
+```bash
+pip install fairseq
+```
+
+On MacOS:
+```bash
+CFLAGS="-stdlib=libc++" pip install fairseq
+```
 
 If you use Docker make sure to increase the shared memory size either with
 `--ipc=host` or `--shm-size` as command line options to `nvidia-docker run`.
 
-After PyTorch is installed, you can install fairseq with `pip`:
-```
-pip install fairseq
-```
-On MacOS,
-```
-CFLAGS="-stdlib=libc++" pip install fairseq
-```
 **Installing from source**
 
 To install fairseq from source and develop locally:
-```
+```bash
 git clone https://github.com/pytorch/fairseq
 cd fairseq
 pip install --editable .
 ```
-
-**Improved training speed**
-
-Training speed can be further improved by installing NVIDIA's
-[apex](https://github.com/NVIDIA/apex) library with the `--cuda_ext` option.
-fairseq will automatically switch to the faster modules provided by apex.
 
 # Getting Started
 
@@ -93,9 +108,13 @@ We provide pre-trained models and pre-processed, binarized test sets for several
 as well as example training and evaluation commands.
 
 - [Translation](examples/translation/README.md): convolutional and transformer models are available
-- [Language Modeling](examples/language_model/README.md): convolutional models are available
+- [Language Modeling](examples/language_model/README.md): convolutional and transformer models are available
+- [wav2vec](examples/wav2vec/README.md): wav2vec large model is available
 
 We also have more detailed READMEs to reproduce results from specific papers:
+- [Jointly Learning to Align and Translate with Transformer Models (Garg et al., 2019)](examples/joint_alignment_translation/README.md )
+- [Levenshtein Transformer (Gu et al., 2019)](examples/nonautoregressive_translation/README.md)
+- [Facebook FAIR's WMT19 News Translation Task Submission (Ng et al., 2019)](examples/wmt19/README.md)
 - [RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)](examples/roberta/README.md)
 - [wav2vec: Unsupervised Pre-training for Speech Recognition (Schneider et al., 2019)](examples/wav2vec/README.md)
 - [Mixture Models for Diverse Machine Translation: Tricks of the Trade (Shen et al., 2019)](examples/translation_moe/README.md)
