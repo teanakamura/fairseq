@@ -1,5 +1,6 @@
 **Data**
 **data**
+**checkpoint**
 *.txt
 
 /fairseq/examples/translation/iwslt14.tokenized.de-en/
