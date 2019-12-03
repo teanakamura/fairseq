@@ -5,7 +5,7 @@ EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
 DATA_DIR='../data-bin/cnndm/'
 SAVE_DIR='../checkpoints/cnndm/insertion_transformer/'
 
-CUDA_VISIBLE_DEVICES=7,8,9 \
+#CUDA_VISIBLE_DEVICES=7,8,9 \
    python ${EXEC_FILE_PATH}train.py ${DATA_DIR} \
    --arch insertion_transformer \
       --max-source-positions 2048 \
