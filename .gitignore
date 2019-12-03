@@ -1,6 +1,6 @@
 **Data**
 **data**
-!/fairseq/fairseq/data
+!/fairseq/fairseq/**
 **checkpoint**
 *.txt
 
