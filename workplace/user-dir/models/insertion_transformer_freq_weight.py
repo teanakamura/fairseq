@@ -17,6 +17,10 @@ from fairseq.modules.transformer_sentence_encoder import init_bert_params
 from fairseq.utils import new_arange
 
 
+class NegativeDistanceScoreFreqWeight(object):
+    def __call__(self, w, tgt_dict):
+      return 1 / tgt_dict.count[w]
+  
 class NegativeDistanceScore(object):
     def __init__(self):
 
@@ -48,10 +52,10 @@ class NegativeDistanceScore(object):
         return s / s.sum(1, keepdims=True)
 
 
-neg_scorer = NegativeDistanceScore()
+neg_scorer = NegativeDistanceScoreFreqWeight()
 
 
-def _get_ins_targets(in_tokens, out_tokens, padding_idx, unk_idx, vocab_size, tau=None):
+def _get_ins_targets(in_tokens, out_tokens, padding_idx, unk_idx, vocab_size, tgt_dict, tau=None):
     try:
         from fairseq import libnat
     except ImportError as e:
@@ -81,7 +85,7 @@ def _get_ins_targets(in_tokens, out_tokens, padding_idx, unk_idx, vocab_size, ta
     insert_label_tensors = in_tokens.new_zeros(B * (T - 1) * V).float()
     insert_index, insert_labels = zip(
         *[
-            (w + (j + i * (T - 1)) * V, neg_scorer(k, len(label), tau))
+            (w + (j + i * (T - 1)) * V, neg_scorer(w, tgt_dict))
             for i, labels in enumerate(insert_labels)
             for j, label in enumerate(labels[1:-1])
             for k, w in enumerate(label)
@@ -93,6 +97,7 @@ def _get_ins_targets(in_tokens, out_tokens, padding_idx, unk_idx, vocab_size, ta
     ]
     insert_label_tensors.scatter_(0, insert_index.long(), insert_labels)
     insert_label_tensors = insert_label_tensors.view(B, T - 1, V)
+    insert_label_tensors = insert_label_tensors / torch.sum(insert_label_tensors, -1).unsqueeze(-1)  # NegativeWeightScorerFreqWeight
 
     return insert_label_tensors
 
@@ -156,6 +161,7 @@ class InsertionTransformerModel(LevenshteinTransformerModel):
             self.pad,
             self.unk,
             len(self.tgt_dict),
+            self.tgt_dict,
             tau=self.decoder.label_tau,
         ).type_as(word_ins_out)
         word_ins_masks = prev_output_tokens[:, 1:].ne(self.pad)
