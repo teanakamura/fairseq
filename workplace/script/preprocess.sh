@@ -2,7 +2,7 @@ CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
 EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
-DATA='cnndm'
+DATA='cnndm_dot_small'
 DATA_DIR=$HOME'/Data/cnndm-pj/'${DATA}
 DEST_DIR='../data-bin/'${DATA}
 

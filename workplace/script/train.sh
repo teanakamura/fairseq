@@ -2,13 +2,14 @@ CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
 EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
-DATA_DIR='../data-bin/cnndm_small/'
-SAVE_DIR='../checkpoints/cnndm_small/insertion_transformer3/'
+DATA_DIR='../data-bin/cnndm_dot_small/'
+SAVE_DIR='../checkpoints/cnndm_dot_small/insertion_transformer3/'
+USER_DIR='../user-dir/'
 
 CUDA_VISIBLE_DEVICES=7,8,9 \
    python ${EXEC_FILE_PATH}train.py ${DATA_DIR} \
    --save-dir ${SAVE_DIR} \
-   --arch insertion_transformer \
+   --arch insertion_transformer_freq_weight \
       --max-source-positions 2048 \
       --max-target-positions 512 \
       --apply-bert-init \
@@ -37,4 +38,5 @@ CUDA_VISIBLE_DEVICES=7,8,9 \
    --save-interval-updates 20000 \
    --max-update 300000 \
    --skip-invalid-size-inputs-valid-test \
+   --user-dir ${USER_DIR}
 #--fp16 \
