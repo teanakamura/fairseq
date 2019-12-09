@@ -3,9 +3,11 @@
 !/fairseq/fairseq/**
 **checkpoint**
 *.txt
+workplace**/*log
 
 /fairseq/examples/translation/iwslt14.tokenized.de-en/
 /fairseq/examples/translation/mosesdecoder/
 /fairseq/examples/translation/orig/
 /fairseq/examples/translation/subword-nmt/
+/fairseq/examples/translation/wmt17_en_de/
 /wmt14.en-fr.fconv-py

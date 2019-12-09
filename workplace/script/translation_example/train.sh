@@ -1,22 +1,21 @@
 CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
-EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
-DATA_DIR='../data-bin/cnndm_small/'
-SAVE_DIR='../checkpoints/cnndm_small/insertion_transformer3/'
+EXEC_FILE_PATH=~/fairseq/fairseq/fairseq_cli/
+DATA_DIR=~/fairseq/workplace/data-bin/wmt17_en_de/
+SAVE_DIR=~/fairseq/workplace/checkpoints/wmt17_en_de/insertion_transformer/
 
 CUDA_VISIBLE_DEVICES=7,8,9 \
    python ${EXEC_FILE_PATH}train.py ${DATA_DIR} \
    --save-dir ${SAVE_DIR} \
    --arch insertion_transformer \
-      --max-source-positions 2048 \
-      --max-target-positions 512 \
       --apply-bert-init \
    --task translation_lev \
    --ddp-backend=no_c10d \
    --criterion nat_loss \
       --label-smoothing 0.1 \
    --noise random_delete \
+   --share-all-embeddings \
    --optimizer adam \
       --adam-betas '(0.9,0.98)' \
    --lr 0.0005 \
@@ -29,12 +28,8 @@ CUDA_VISIBLE_DEVICES=7,8,9 \
    --decoder-learned-pos \
    --encoder-learned-pos \
    --log-format 'simple' \
-   --log-interval 1000 \
+   --log-interval 100 \
    --fixed-validation-seed 7 \
-   --max-tokens 2048 \
-   --max-sentences 16 \
-   --update-freq 4 \
-   --save-interval-updates 20000 \
-   --max-update 300000 \
-   --skip-invalid-size-inputs-valid-test \
-#--fp16 \
+   --max-tokens 4096 \
+   --save-interval-updates 10000 \
+   --max-update 300000
