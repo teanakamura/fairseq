@@ -1,7 +1,8 @@
 CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
-EXEC_FILE_PATH=~/fairseq/fairseq/fairseq_cli/
+#EXEC_FILE_PATH=~/fairseq/fairseq/fairseq_cli/
+EXEC_FILE_PATH=../
 DATA_DIR=~/fairseq/workplace/data-bin/wmt17_en_de/
 SAVE_DIR=~/fairseq/workplace/checkpoints/wmt17_en_de/insertion_transformer/checkpoint_best.pt
 

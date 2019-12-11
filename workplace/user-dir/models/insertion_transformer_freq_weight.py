@@ -16,9 +16,12 @@ from fairseq.models.transformer import Linear, TransformerModel
 from fairseq.modules.transformer_sentence_encoder import init_bert_params
 from fairseq.utils import new_arange
 
+class NegativeDistanceScoreFreqWeightExp(object):
+    def __call__(self, w, tgt_dict, tau):
+      return np.exp(-tgt_dict.count[w] / tau)
 
 class NegativeDistanceScoreFreqWeight(object):
-    def __call__(self, w, tgt_dict):
+    def __call__(self, w, tgt_dict, tau=None):
       return 1 / tgt_dict.count[w]
   
 class NegativeDistanceScore(object):
@@ -52,7 +55,7 @@ class NegativeDistanceScore(object):
         return s / s.sum(1, keepdims=True)
 
 
-neg_scorer = NegativeDistanceScoreFreqWeight()
+neg_scorer = NegativeDistanceScoreFreqWeightExp()
 
 
 def _get_ins_targets(in_tokens, out_tokens, padding_idx, unk_idx, vocab_size, tgt_dict, tau=None):
@@ -85,7 +88,7 @@ def _get_ins_targets(in_tokens, out_tokens, padding_idx, unk_idx, vocab_size, tg
     insert_label_tensors = in_tokens.new_zeros(B * (T - 1) * V).float()
     insert_index, insert_labels = zip(
         *[
-            (w + (j + i * (T - 1)) * V, neg_scorer(w, tgt_dict))
+            (w + (j + i * (T - 1)) * V, neg_scorer(w, tgt_dict, tau))
             for i, labels in enumerate(insert_labels)
             for j, label in enumerate(labels[1:-1])
             for k, w in enumerate(label)
