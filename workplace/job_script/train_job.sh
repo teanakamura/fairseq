@@ -5,7 +5,7 @@ cd $SCRIPT_DIR
 echo $SCRIPT_DIR
 pwd
 
-#$ -l rt_G.small=1
+#$ -l rt_F=1
 #$ -l h_rt=72:00:00
 #$ -j y
 #$ -cwd
