@@ -9,8 +9,8 @@ pwd
 #$ -l h_rt=72:00:00
 #$ -j y
 #$ -cwd
-#$ -o std/out
-#$ -e std/err
+#$ -o std/std0/out
+#$ -e std/std0/err
 
 pwd 
 
