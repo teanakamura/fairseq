@@ -4,7 +4,9 @@
 **checkpoint**
 *.txt
 workplace**/*log
+workplace/generation/*
 **__pycache__
+
 
 /fairseq/examples/translation/iwslt14.tokenized.de-en/
 /fairseq/examples/translation/mosesdecoder/
