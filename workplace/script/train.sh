@@ -5,10 +5,11 @@ cd $SCRIPT_DIR
 FAIRSEQ_ROOT=~/fairseq/
 DATA=cnndm
 MODEL=insertion_transformer_fw_tau
-EXEC_FILE_PATH=${FIARSEQ_ROOT}fairseq/fairseq_cli/
-DATA_DIR=${FIARSEQ_ROOT}workplace/data-bin/${DATA}/
-SAVE_DIR=${FIARSEQ_ROOT}workplace/checkpoints/${DATA}/${MODEL}/
-USER_DIR=${FIARSEQ_ROOT}workplace/user-dir/
+EXEC_FILE_PATH=${FAIRSEQ_ROOT}fairseq/fairseq_cli/
+echo ${EXEC_FILE_PATH}
+DATA_DIR=${FAIRSEQ_ROOT}workplace/data-bin/${DATA}/
+SAVE_DIR=${FAIRSEQ_ROOT}workplace/checkpoints/${DATA}/${MODEL}/
+USER_DIR=${FAIRSEQ_ROOT}workplace/user-dir/
 
 
 #CUDA_VISIBLE_DEVICES=7,8,9 \
