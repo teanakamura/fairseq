@@ -175,9 +175,9 @@ class TransformerModel(FairseqEncoderDecoderModel):
         if args.decoder_layers_to_keep:
             args.decoder_layers = len(args.decoder_layers_to_keep.split(","))
 
-        if not hasattr(args, 'max_source_positions'):
+        if getattr(args, 'max_source_positions', None) is None:
             args.max_source_positions = DEFAULT_MAX_SOURCE_POSITIONS
-        if not hasattr(args, 'max_target_positions'):
+        if getattr(args, 'max_target_positions', None) is None:
             args.max_target_positions = DEFAULT_MAX_TARGET_POSITIONS
 
         src_dict, tgt_dict = task.source_dictionary, task.target_dictionary
@@ -353,7 +353,7 @@ class TransformerEncoder(FairseqEncoder):
 
     def forward_embedding(self, src_tokens):
         # embed tokens and positions
-        embed = self.embed_scale * self.embed_tokens(src_tokens)
+        x = embed = self.embed_scale * self.embed_tokens(src_tokens)
         if self.embed_positions is not None:
             x = embed + self.embed_positions(src_tokens)
         if self.layernorm_embedding:
