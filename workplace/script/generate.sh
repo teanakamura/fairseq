@@ -3,23 +3,32 @@ SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
 #EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
 EXEC_FILE_PATH='./'
-DATA_DIR='../data-bin/cnndm_small/'
-SAVE_DIR='../checkpoints/cnndm_small/insertion_transformer_tau/checkpoint_last.pt'
-USER_DIR='../user-dir/'
+MODEL=insertion_transformer_fw_tau
+DATA=cnndm_small
+DATA_DIR=../data-bin/${DATA}/
+SAVE_DIR=../checkpoints/${DATA}/${MODEL}/checkpoint1000.pt
+USER_DIR=../user-dir/
+OUT_DIR=../generation/${DATA}/${MODEL}/ 
+SYSTEM=system_output.txt
+REFERENCE=reference.txt
+
+mkdir -p ${OUT_DIR}
 
 CUDA_VISIBLE_DEVICES=7,8,9 \
    python ${EXEC_FILE_PATH}generate.py ${DATA_DIR} \
-   --gen-subset train \
+   --gen-subset test \
    --path ${SAVE_DIR} \
    --beam 5 \
    --task translation_lev \
-      --iter-decode-max-iter 10 \
+      --iter-decode-max-iter 4 \
       --iter-decode-eos-penalty 1 \
    --print-step \
-   --retain-iter-history \
    --max-tokens 4096 \
    --skip-invalid-size-inputs-valid-test \
    --max-source-positions 2048 \
    --min-len 5 \
-   --user-dir ${USER_DIR}
+   --user-dir ${USER_DIR} \
+   --system ${OUT_DIR}${SYSTEM}\
+   --reference ${OUT_DIR}${REFERENCE} \
+   --retain-iter-history \
 #  --iter-decode-force-max-iter \

@@ -1,24 +1,29 @@
 CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
-#EXEC_FILE_PATH=~/fairseq/fairseq/fairseq_cli/
-EXEC_FILE_PATH=../
-DATA_DIR=~/fairseq/workplace/data-bin/wmt17_en_de/
-SAVE_DIR=~/fairseq/workplace/checkpoints/wmt17_en_de/insertion_transformer/checkpoint_best.pt
+#EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
+EXEC_FILE_PATH='../'
+DATA_DIR='../../data-bin/cnndm_small/'
+SAVE_DIR='../../checkpoints/cnndm_small/transformer/checkpoint_last.pt'
+USER_DIR='../../user-dir/'
+OUT_DIR=../../generation/cnndm/transformer/
+SYSTEM=system_output.txt
+REFERENCE=reference.txt
 
-#CUDA_VISIBLE_DEVICES=2,3 \
+
+CUDA_VISIBLE_DEVICES=7,8,9 \
    python ${EXEC_FILE_PATH}generate.py ${DATA_DIR} \
-   --gen-subset test \
+   --gen-subset train \
    --path ${SAVE_DIR} \
-   --batch-size 32 \
    --beam 5 \
-   --task translation_lev \
-      --iter-decode-max-iter 100 \
-      --iter-decode-eos-penalty 0 \
-      --iter-decode-force-max-iter \
-   --print-step \
+   --task translation \
+      --iter-decode-max-iter 10 \
+      --iter-decode-eos-penalty 1 \
    --max-tokens 4096 \
    --skip-invalid-size-inputs-valid-test \
    --max-source-positions 2048 \
-   --remove-bpe \
-   --min-len 5 
+   --min-len 5 \
+   --user-dir ${USER_DIR} \
+   --system ${OUT_DIR}${SYSTEM}\
+   --reference ${OUT_DIR}${REFERENCE}
+#  --iter-decode-force-max-iter \

@@ -6,9 +6,10 @@ from sumeval.metrics.rouge import RougeCalculator
 
 def read_file(filename, bpe_symbol=None):
   with open(filename) as f:
-    #lines = [process_bpe_symbol(line.strip(), bpe_symbol) for line in f]
-    lines = [l.split() for l in f]
-  return lines
+    # lines = [process_bpe_symbol(line.strip(), bpe_symbol) for line in f]
+    # lines = [l.split() for l in f]
+    # from IPython import embed; embed()
+    return f.readlines()
 
 
 def main(args):
@@ -29,12 +30,16 @@ def main(args):
 
 
 if __name__ == "__main__":
+  # data_path = '../generation/cnndm_small/insertion_transformer_fw_tau/'
+  # data_path = '../generation/cnndm_small/insertion_transformer/'
+  data_path = '../generation/cnndm_small/transformer/'
+  # data_path = '../generation/wmt14/'
   parser = argparse.ArgumentParser()
   parser.add_argument('-s', '--system', dest='system_out',
-      default='../generation/system_output.txt',
+      default=data_path+'system_output.txt',
       help='specify the system output file name')
   parser.add_argument('-r', '--reference', dest='reference',
-      default='../generation/reference.txt',
+      default=data_path+'reference.txt',
       help='specify the reference file name')
   parser.add_argument('-l', '--lang', default='en')
   parser.add_argument('--alpha', type=float, default=0.5)
