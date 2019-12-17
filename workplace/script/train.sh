@@ -1,10 +1,15 @@
 CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
-EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
-DATA_DIR='../data-bin/cnndm_small/'
-SAVE_DIR='../checkpoints/cnndm_small/insertion_transformer_fw_tau/'
-USER_DIR='../user-dir/'
+
+FAIRSEQ_ROOT=~/fairseq/
+DATA=cnndm
+MODEL=insertion_transformer_fw_tau
+EXEC_FILE_PATH=${FIARSEQ_ROOT}fairseq/fairseq_cli/
+DATA_DIR=${FIARSEQ_ROOT}workplace/data-bin/${DATA}/
+SAVE_DIR=${FIARSEQ_ROOT}workplace/checkpoints/${DATA}/${MODEL}/
+USER_DIR=${FIARSEQ_ROOT}workplace/user-dir/
+
 
 #CUDA_VISIBLE_DEVICES=7,8,9 \
    python ${EXEC_FILE_PATH}train.py ${DATA_DIR} \
@@ -13,7 +18,7 @@ USER_DIR='../user-dir/'
       --max-source-positions 2048 \
       --max-target-positions 512 \
       --apply-bert-init \
-      --label-tau 0.1 \
+      --label-tau 0.01 \
    --task translation_lev \
    --ddp-backend=no_c10d \
    --criterion nat_loss \
@@ -39,5 +44,5 @@ USER_DIR='../user-dir/'
    --save-interval-updates 20000 \
    --max-update 300000 \
    --skip-invalid-size-inputs-valid-test \
-   --user-dir ${USER_DIR}
-#--fp16 \
+   --user-dir ${USER_DIR} \
+   --fp16 \
