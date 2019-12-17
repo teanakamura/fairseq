@@ -1,16 +1,20 @@
 CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
-EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
-DATA_DIR='../data-bin/cnndm_small/'
-SAVE_DIR='../checkpoints/cnndm_small/transformer/'
-USER_DIR='../user-dir/'
+
+FAIRSEQ_ROOT=~/fairseq/
+DATA=cnndm_annt_small
+MODEL=transformer
+EXEC_FILE_PATH=${FIARSEQ_ROOT}fairseq/fairseq_cli/
+DATA_DIR=${FIARSEQ_ROOT}workplace/data-bin/${DATA}/
+SAVE_DIR=${FIARSEQ_ROOT}workplace/checkpoints/${DATA}/${MODEL}/
+USER_DIR=${FIARSEQ_ROOT}workplace/user-dir/
 
 CUDA_VISIBLE_DEVICES=0,2,3 \
    python ${EXEC_FILE_PATH}train.py ${DATA_DIR} \
    --save-dir ${SAVE_DIR} \
    --arch transformer \
-      --max-source-positions 2048 \
+      --max-source-positions 512 \
       --max-target-positions 512 \
    --task translation \
    --ddp-backend=no_c10d \

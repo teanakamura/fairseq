@@ -1,11 +1,12 @@
 **Data**
 **data**
-!/fairseq/fairseq/**
 **checkpoint**
 *.txt
 workplace**/*log
 workplace/generation/*
+workplace/job_script/std/*
 **__pycache__
+!/fairseq/fairseq/**
 
 
 /fairseq/examples/translation/iwslt14.tokenized.de-en/
