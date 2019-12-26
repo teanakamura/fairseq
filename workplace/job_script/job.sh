@@ -27,4 +27,4 @@ module load cudnn/7.6/7.6.4
 
 source ~/venv/pytorch/bin/activate
 
-source ~/fairseq/workplace/script/transformer/train.sh
+source ~/fairseq/workplace/script/generate.sh

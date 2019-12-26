@@ -1,20 +1,22 @@
-CURRENT_DIR=`pwd`
-SCRIPT_DIR=`dirname $0`
-cd $SCRIPT_DIR
-#EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
-EXEC_FILE_PATH='./'
-MODEL=insertion_transformer_fw_tau
-DATA=cnndm/small
-DATA_DIR=../data-bin/${DATA}/
-SAVE_DIR=../checkpoints/${DATA}/${MODEL}/checkpoint3000.pt
-USER_DIR=../user-dir/
-OUT_DIR=../generation/${DATA}/${MODEL}_best/
+#CURRENT_DIR=`pwd`
+#SCRIPT_DIR=`dirname $0`
+#cd $SCRIPT_DIR
+
+FAIRSEQ_ROOT=~/fairseq/
+EXEC_FILE_PATH=${FAIRSEQ_ROOT}workplace/script/
+TRAIN_DATA=cnndm_full_annt
+TEST_DATA=tfidf_annt_from_sum
+MODEL=transformer
+DATA_DIR=${FAIRSEQ_ROOT}workplace/data-bin/${TEST_DATA}/
+SAVE_DIR=${FAIRSEQ_ROOT}workplace/checkpoints/${TRAIN_DATA}/${MODEL}/checkpoint_best.pt
+USER_DIR=${FAIRSEQ_ROOT}workplace/user-dir/
+OUT_DIR=${FAIRSEQ_ROOT}workplace/generation/${TEST_DATA}/${MODEL}_best/
 SYSTEM=system_output.txt
 REFERENCE=reference.txt
 
 mkdir -p ${OUT_DIR}
 
-CUDA_VISIBLE_DEVICES=7,8,9 \
+#CUDA_VISIBLE_DEVICES=7,8,9 \
    python ${EXEC_FILE_PATH}generate.py ${DATA_DIR} \
    --gen-subset test \
    --path ${SAVE_DIR} \
@@ -25,7 +27,7 @@ CUDA_VISIBLE_DEVICES=7,8,9 \
    --print-step \
    --max-tokens 4096 \
    --skip-invalid-size-inputs-valid-test \
-   --max-source-positions 2048 \
+   --max-source-positions 512 \
    --min-len 5 \
    --user-dir ${USER_DIR} \
    --system ${OUT_DIR}${SYSTEM}\
