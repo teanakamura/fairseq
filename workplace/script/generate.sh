@@ -4,11 +4,11 @@ cd $SCRIPT_DIR
 #EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
 EXEC_FILE_PATH='./'
 MODEL=insertion_transformer_fw_tau
-DATA=cnndm_small
+DATA=cnndm/small
 DATA_DIR=../data-bin/${DATA}/
-SAVE_DIR=../checkpoints/${DATA}/${MODEL}/checkpoint1000.pt
+SAVE_DIR=../checkpoints/${DATA}/${MODEL}/checkpoint3000.pt
 USER_DIR=../user-dir/
-OUT_DIR=../generation/${DATA}/${MODEL}/ 
+OUT_DIR=../generation/${DATA}/${MODEL}_best/
 SYSTEM=system_output.txt
 REFERENCE=reference.txt
 
@@ -20,7 +20,7 @@ CUDA_VISIBLE_DEVICES=7,8,9 \
    --path ${SAVE_DIR} \
    --beam 5 \
    --task translation_lev \
-      --iter-decode-max-iter 4 \
+      --iter-decode-max-iter 30 \
       --iter-decode-eos-penalty 1 \
    --print-step \
    --max-tokens 4096 \

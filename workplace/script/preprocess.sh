@@ -1,13 +1,15 @@
 CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
-EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
-DATA='cnndm_dot_small'
-DATA_DIR=$HOME'/Data/cnndm-pj/'${DATA}
-DEST_DIR='../data-bin/'${DATA}
+EXEC_FILE_PATH=../../fairseq/fairseq_cli/
+DATA=cnndm-pj
+SIZE=full
+DETAIL=tfidf_annt_from_sum
+DATA_DIR=$HOME/Data/$DATA/$SIZE/$DETAIL
+DEST_DIR=../data-bin/$DATA/$SIZE/$DETAIL
 
 python ${EXEC_FILE_PATH}preprocess.py \
-  --task translation_lev \
+  --task translation \
   --source-lang doc \
   --target-lang sum \
   --trainpref ${DATA_DIR}/train \
@@ -16,4 +18,4 @@ python ${EXEC_FILE_PATH}preprocess.py \
   --destdir ${DEST_DIR} \
   --nwordssrc 50000 \
   --nwordstgt 50000 \
-  --joined-dictionary
+  --joined-dictionary \

@@ -3,8 +3,8 @@ SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
 #EXEC_FILE_PATH='../../fairseq/fairseq_cli/'
 EXEC_FILE_PATH='../'
-DATA_DIR='../../data-bin/cnndm_small/'
-SAVE_DIR='../../checkpoints/cnndm_small/transformer/checkpoint_last.pt'
+DATA_DIR='../../data-bin/cnndm/small/'
+SAVE_DIR='../../checkpoints/cnndm/small/transformer/checkpoint_last.pt'
 USER_DIR='../../user-dir/'
 OUT_DIR=../../generation/cnndm/transformer/
 SYSTEM=system_output.txt

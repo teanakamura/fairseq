@@ -30,10 +30,11 @@ def main(args):
 
 
 if __name__ == "__main__":
-  # data_path = '../generation/cnndm_small/insertion_transformer_fw_tau/'
-  # data_path = '../generation/cnndm_small/insertion_transformer/'
-  data_path = '../generation/cnndm_small/transformer/'
-  # data_path = '../generation/wmt14/'
+  data_path = '../generation/cnndm_small/insertion_transformer_tau/'
+  #data_path = '../generation/cnndm_small/insertion_transformer_tau/'
+  #data_path = '../generation/cnndm_small/insertion_transformer_tau/'
+#data_path = '../generation/cnndm/small/insertion_transformer_fw_tau_best/'
+#data_path = '../generation/wmt14/'
   parser = argparse.ArgumentParser()
   parser.add_argument('-s', '--system', dest='system_out',
       default=data_path+'system_output.txt',
