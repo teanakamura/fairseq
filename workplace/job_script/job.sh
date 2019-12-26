@@ -10,7 +10,7 @@ pwd
 #$ -j y
 #$ -cwd
 #$ -o std/std0/out
-#$ -e std/std0/err
+##$ -e std/std0/err
 
 pwd 
 
@@ -27,4 +27,4 @@ module load cudnn/7.6/7.6.4
 
 source ~/venv/pytorch/bin/activate
 
-source ~/fairseq/workplace/script/generate.sh
+source ~/fairseq/workplace/script/$1
