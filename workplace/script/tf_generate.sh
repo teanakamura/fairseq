@@ -1,13 +1,22 @@
-#CURRENT_DIR=`pwd`
-#SCRIPT_DIR=`dirname $0`
-#cd $SCRIPT_DIR
-
 FAIRSEQ_ROOT=~/fairseq/
+CONF_FILE=${FAIRSEQ_ROOT}workplace/script/configs/v2.conf
+declare -A CONF # bash>=4.2
+echo $CONF_FILE
+
+while read line
+do
+  if echo $line | grep -F = &>/dev/null
+  then
+    varname=$(echo "$line" | cut -d '=' -f 1)
+    CONF[$varname]=$(echo "$line" | cut -d '=' -f 2-)
+  fi
+done < $CONF_FILE
+
 EXEC_FILE_PATH=${FAIRSEQ_ROOT}workplace/script/
-DATA_DIR=${FAIRSEQ_ROOT}workplace/data-bin/${DATA}/
-SAVE_DIR=${FAIRSEQ_ROOT}workplace/checkpoints/${_DATA}/${MODEL}/checkpoint${checkpoint}.pt
+DATA_DIR=${FAIRSEQ_ROOT}workplace/data-bin/${CONF[data]}/
+SAVE_DIR=${FAIRSEQ_ROOT}workplace/checkpoints/${CONF[data]}/${CONF[model]}/checkpoint${CONF[checkpoint]}.pt
 USER_DIR=${FAIRSEQ_ROOT}workplace/user-dir/
-OUT_DIR=${FAIRSEQ_ROOT}workplace/generation/${DATA}/${MODEL}_best/
+OUT_DIR=${FAIRSEQ_ROOT}workplace/generation/${CONF[data]}/${CONF[model]}_best/
 SYSTEM=system_output.txt
 REFERENCE=reference.txt
 

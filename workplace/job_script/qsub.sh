@@ -1,4 +1,5 @@
 #!/bin/bash
+#@(#) This script is to easily execute qsub
 
 _usage() {
   echo "Usage:"
