@@ -11,12 +11,16 @@ do
     CONF[$varname]=$(echo "$line" | cut -d '=' -f 2-)
   fi
 done < $CONF_FILE
+CONF[data]=tfidf_annt_from_sum
+CONF[sdata]=tfidf_annt_from_sum_fail
+CONF[model]=transformer
+CONF[checkpoint]=34
 
 EXEC_FILE_PATH=${FAIRSEQ_ROOT}workplace/script/
 DATA_DIR=${FAIRSEQ_ROOT}workplace/data-bin/${CONF[data]}/
-SAVE_DIR=${FAIRSEQ_ROOT}workplace/checkpoints/${CONF[data]}/${CONF[model]}/checkpoint${CONF[checkpoint]}.pt
+SAVE_DIR=${FAIRSEQ_ROOT}workplace/checkpoints/${CONF[sdata]}/${CONF[model]}/checkpoint${CONF[checkpoint]}.pt
 USER_DIR=${FAIRSEQ_ROOT}workplace/user-dir/
-OUT_DIR=${FAIRSEQ_ROOT}workplace/generation/${CONF[data]}/${CONF[model]}_best/
+OUT_DIR=${FAIRSEQ_ROOT}workplace/generation/${CONF[sdata]}/${CONF[model]}_best/
 SYSTEM=system_output.txt
 REFERENCE=reference.txt
 

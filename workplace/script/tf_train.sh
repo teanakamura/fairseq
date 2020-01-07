@@ -55,3 +55,4 @@ echo $SAVE_DIR
    --skip-invalid-size-inputs-valid-test \
    --user-dir ${USER_DIR} \
    --fp16 \
+   --keep-last-epochs 10 \

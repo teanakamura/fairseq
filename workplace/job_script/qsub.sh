@@ -26,11 +26,11 @@ shift `expr ${OPTIND} - 1`
 [[ ${CHECK_o}${CHECK_e} != truetrue && $FAIL_OTHER != true ]] && _usage  # Missing required option
 while [ -z $STDOUT ]
 do
-  read -p "  Input std out file path (-o): " STDOUT
+  read "STDOUT?  Input std out file path (-o): "
 done
 while [ -z $EXE ]
 do
-  read -p "  Input execution file (-e): " EXE
+  read "EXE?  Input execution file (-e): "
 done
 
 
