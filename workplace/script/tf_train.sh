@@ -1,5 +1,5 @@
 FAIRSEQ_ROOT=~/fairseq/
-CONF_FILE=${FAIRSEQ_ROOT}workplace/script/configs/v1.conf
+CONF_FILE=${FAIRSEQ_ROOT}workplace/script/configs/lab.conf
 declare -A CONF # bash>=4.2
 echo $CONF_FILE
 
@@ -27,12 +27,13 @@ echo $SAVE_DIR
 #CUDA_VISIBLE_DEVICES=0,2,3 \
    python ${EXEC_FILE_PATH}train.py ${DATA_DIR} \
    --save-dir ${SAVE_DIR} \
-   --arch transformer \
+   --arch transformer_cov \
       --max-source-positions 512 \
       --max-target-positions 512 \
    --task translation \
+     --truncate-source \
    --ddp-backend=no_c10d \
-   --criterion cross_entropy \
+   --criterion cross_entropy_with_coverage \
    --optimizer adam \
       --adam-betas '(0.9,0.98)' \
    --lr 0.0005 \
@@ -54,5 +55,5 @@ echo $SAVE_DIR
    --max-update 300000 \
    --skip-invalid-size-inputs-valid-test \
    --user-dir ${USER_DIR} \
-   --fp16 \
    --keep-last-epochs 10 \
+   #--fp16 \
