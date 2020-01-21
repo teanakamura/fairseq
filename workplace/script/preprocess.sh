@@ -4,9 +4,13 @@ cd $SCRIPT_DIR
 EXEC_FILE_PATH=../../fairseq/fairseq_cli/
 DATA=cnndm-pj
 SIZE=full
-DETAIL=tfidf_annt_from_sum
-DATA_DIR=$HOME/Data/$DATA/$SIZE/$DETAIL
-DEST_DIR=../data-bin/$DATA/$SIZE/$DETAIL
+DETAIL=stopword_annt
+#DATA_DETAIL=$DETAIL
+#DEST_DETAIL=$DETAIL
+DATA_DETAIL=$DETAIL/subword-nmt
+DEST_DETAIL=$DETAIL-subword
+DATA_DIR=$HOME/Data/$DATA/$SIZE/$DATA_DETAIL
+DEST_DIR=../data-bin/$DATA/$SIZE/$DEST_DETAIL
 
 python ${EXEC_FILE_PATH}preprocess.py \
   --task translation \
@@ -19,3 +23,4 @@ python ${EXEC_FILE_PATH}preprocess.py \
   --nwordssrc 50000 \
   --nwordstgt 50000 \
   --joined-dictionary \
+  --workers 16 \
