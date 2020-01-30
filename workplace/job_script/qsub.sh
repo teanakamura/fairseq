@@ -1,43 +1,63 @@
-#!/bin/bash
+#!/bin/zsh
 #@(#) This script is to easily execute qsub
 
 _usage() {
   echo "Usage:"
-  echo "  ${0} -o STDOUT_FILE -s EXEC_SCRIPT"
+  echo "  source $1 -o STDOUT_FILE -e EXEC_SCRIPT -c CONFIG_FILE\n"
   #exit 1
 }
+echo $0
+echo $1
 
-while getopts o:e: OPT;
+CURRENT_DIR=`pwd`
+SCRIPT_DIR=`dirname $0`
+
+while getopts o:e:c: OPT;
 do
   case ${OPT} in
     o) CHECK_o=true
        STDOUT=${OPTARG}
+       echo $STDOUT
        ;;
     e) CHECK_e=true
        EXE=${OPTARG}
        ;;
+    c) CHECK_c=true
+       CONFIG=${OPTARG}
+       ;;
     :|\?) FAIL_OTHER=true  # Missing required argument | Invalid option
-          _usage
+          _usage $0
           ;;
   esac
 done
 shift `expr ${OPTIND} - 1`
 
-[[ ${CHECK_o}${CHECK_e} != truetrue && $FAIL_OTHER != true ]] && _usage  # Missing required option
+[[ ${CHECK_o}${CHECK_e}${CHECK_c} != truetrue && $FAIL_OTHER != true ]] && _usage $0  # Missing required option
 while [ -z $STDOUT ]
 do
-  read "STDOUT?  Input std out file path (-o): "
+  ls "$SCRIPT_DIR/std"
+  read "STDOUT?Input std out file path (-o): "
+  echo ""
 done
-while [ -z $EXE ]
+while [ ! -f "$SCRIPT_DIR/../script/$EXE" ]
 do
-  read "EXE?  Input execution file (-e): "
+  ls "$SCRIPT_DIR/../script" | grep -E ".+\.sh" --colour=never
+  read "EXE?Input execution file (-e): "
+  echo ""
+done
+while [ ! -f "$SCRIPT_DIR/../script/configs/$CONFIG" ]
+do
+  ls "$SCRIPT_DIR/../script/configs" | grep -E ".+\.conf" --colour=never
+  read "CONFIG?Input config file (-c): "
+  echo ""
 done
 
-
-CURRENT_DIR=`pwd`
-SCRIPT_DIR=`dirname $0`
 cd $SCRIPT_DIR
 JOB_SCRIPT=~/fairseq/workplace/job_script/job.sh
-echo "qsub -o "$STDOUT" "$JOB_SCRIPT" "$EXE
-#qsub -o $STDOUT $JOB_SCRIPT $EXE
+echo "qsub -o std/$STDOUT $JOB_SCRIPT $EXE $CONFIG"
+qsub -o std/$STDOUT $JOB_SCRIPT $EXE $CONFIG
 
+cd $CURRENT_DIR
+STDOUT=
+EXE=
+CONFIG=
