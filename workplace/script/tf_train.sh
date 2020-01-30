@@ -1,7 +1,19 @@
-FAIRSEQ_ROOT=~/fairseq/
-CONF_FILE=${FAIRSEQ_ROOT}workplace/script/configs/lab.conf
+echo ${JOB_ID}
+
+FAIRSEQ_ROOT=~/fairseq
+#SCRIPT_DIR=`dirname $0`
+#SCRIPT_DIR=${FAIRSEQ_ROOT}/workplace/script
+CONF_DIR=${FAIRSEQ_ROOT}/workplace/script/configs
+CONF_FILE=$1
+
+while [ ! -f "$CONF_DIR/$CONF_FILE" ]
+do
+  ls "$CONF_DIR" | grep -E ".+\.conf" --colour=never
+  read "CONF_FILE?Input config file: "
+done
+
 declare -A CONF # bash>=4.2
-echo $CONF_FILE
+echo "CONFIG FILE: $CONF_FILE"
 
 while read line
 do
@@ -10,16 +22,15 @@ do
     varname=$(echo "$line" | cut -d '=' -f 1)
     CONF[$varname]=$(echo "$line" | cut -d '=' -f 2-)
   fi
-done < $CONF_FILE
+done < $CONF_DIR/$CONF_FILE
+CONF_FILE=
 
-#CURRENT_DIR=`pwd`
-#SCRIPT_DIR=`dirname $0`
-#cd $SCRIPT_DIR
-
-EXEC_FILE_PATH=${FAIRSEQ_ROOT}fairseq/fairseq_cli/
-DATA_DIR=${FAIRSEQ_ROOT}workplace/data-bin/${CONF[data]}/
-SAVE_DIR=${FAIRSEQ_ROOT}workplace/checkpoints/${CONF[data]}/${CONF[model]}/
-USER_DIR=${FAIRSEQ_ROOT}workplace/user-dir/
+EXEC_FILE_PATH=${FAIRSEQ_ROOT}/fairseq/fairseq_cli/
+DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/${CONF[data]}/
+GROUPDISK=/fs1/groups1/gcb50243/nakamura
+SAVE_DIR=${GROUPDISK}/checkpoints/${CONF[data]}/${CONF[model]}/
+USER_DIR=${FAIRSEQ_ROOT}/workplace/user-dir/
+TENSORBOARD_DIR=${FAIRSEQ_ROOT}/workplace/tensorboard-log/${CONF[data]}/${CONF[model]}/log/
 
 echo $DATA_DIR
 echo $SAVE_DIR
@@ -33,7 +44,7 @@ echo $SAVE_DIR
    --task translation \
      --truncate-source \
    --ddp-backend=no_c10d \
-   --criterion cross_entropy_with_coverage \
+   --criterion ${CONF[criterion]} \
    --optimizer adam \
       --adam-betas '(0.9,0.98)' \
    --lr 0.0005 \
@@ -55,5 +66,7 @@ echo $SAVE_DIR
    --max-update 300000 \
    --skip-invalid-size-inputs-valid-test \
    --user-dir ${USER_DIR} \
-   --keep-last-epochs 10 \
-   #--fp16 \
+   --keep-last-epochs 3 \
+   --truncate-source \
+   --fp16 \
+   --tensorboard-logdir ${TENSORBOARD_DIR} \
