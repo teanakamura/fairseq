@@ -5,6 +5,7 @@
 workplace**/*log
 workplace/generation/*
 workplace/job_script/std/*
+workplace/script/configs
 **__pycache__
 !/fairseq/fairseq/**
 
@@ -14,3 +15,4 @@ workplace/job_script/std/*
 /fairseq/examples/translation/orig/
 /fairseq/examples/translation/subword-nmt/
 /fairseq/examples/translation/wmt17_en_de/
+
