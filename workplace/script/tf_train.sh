@@ -40,18 +40,16 @@ do
 done < $CONF_DIR/$CONF_FILE
 CONF_FILE=
 
-EXEC_FILE_PATH=${FAIRSEQ_ROOT}/fairseq/fairseq_cli/
-DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/${CONF[data]}/
-GROUPDISK=/fs1/groups1/gcb50243/nakamura
-SAVE_DIR=${GROUPDISK}/checkpoints/${CONF[data]}/${CONF[model]}/
-USER_DIR=${FAIRSEQ_ROOT}/workplace/user-dir/
-TENSORBOARD_DIR=${FAIRSEQ_ROOT}/workplace/tensorboard-log/${CONF[data]}/${CONF[model]}/log/
-
-echo $DATA_DIR
-echo $SAVE_DIR
+ENV_FILE=${FAIRSEQ_ROOT}/workplace/script/env
+source ${ENV_FILE}
+echo EXEC_FILE_PATH: ${EXEC_FILE_PATH}
+echo DATA_DIR: ${DATA_DIR}
+echo SAVE_DIR: ${SAVE_DIR}
+echo USER_DIR: ${USER_DIR}
+echo TENSORBOARD_DIR: ${TENSORBOARD_DIR}
 
 #CUDA_VISIBLE_DEVICES=0,2,3 \
-   python ${EXEC_FILE_PATH}train.py ${DATA_DIR} \
+OPTIONAL_ARGS="
    --save-dir ${SAVE_DIR} \
    --arch transformer_cov \
       --max-source-positions ${CONF[max_source]} \
@@ -83,5 +81,11 @@ echo $SAVE_DIR
    --user-dir ${USER_DIR} \
    --keep-last-epochs ${CONF[keep_last_epochs]}\
    --truncate-source \
-   --fp16 \
    --tensorboard-logdir ${TENSORBOARD_DIR} \
+"
+if ${CONF[fp16]}; then
+  OPTIONAL_ARGS="$OPTIONAL_ARGS --fp16"
+fi
+echo $OPTIONAL_ARGS
+
+#python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}
