@@ -29,6 +29,7 @@ CONF[max_sentences]=16
 CONF[update_freq]=4
 CONF[max_update]=300000
 CONF[keep_last_epochs]=3
+CONF[fp16]=true
 
 while read line
 do
@@ -59,7 +60,7 @@ OPTIONAL_ARGS="
    --ddp-backend=no_c10d \
    --criterion ${CONF[criterion]} \
    --optimizer adam \
-      --adam-betas '(0.9,0.98)' \
+      --adam-betas (0.9,0.98) \
    --lr ${CONF[lr]} \
    --lr-scheduler inverse_sqrt \
    --min-lr ${CONF[min_lr]} \
@@ -69,7 +70,7 @@ OPTIONAL_ARGS="
    --weight-decay ${CONF[weight_decay]} \
    --decoder-learned-pos \
    --encoder-learned-pos \
-   --log-format 'simple' \
+   --log-format simple \
    --log-interval 1000 \
    --fixed-validation-seed 7 \
    --max-tokens ${CONF[max_tokens]} \
@@ -87,5 +88,4 @@ if ${CONF[fp16]}; then
   OPTIONAL_ARGS="$OPTIONAL_ARGS --fp16"
 fi
 echo $OPTIONAL_ARGS
-
-#python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}
+python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}

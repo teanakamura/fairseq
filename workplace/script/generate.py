@@ -139,7 +139,7 @@ def main(args):
                     if src_dict is not None:
                         print('S-{}\t{}'.format(sample_id, src_str))
                     if has_target:
-                        reference.write(target_str + '\n')
+                        reference.write(f'{sample_id} {target_str}\n')
                         print('T-{}\t{}'.format(sample_id, target_str))
 
                 # Process top predictions
@@ -154,7 +154,7 @@ def main(args):
                     )
 
                     if not args.quiet:
-                        system_out.write(hypo_str + '\n')
+                        system_out.write(f'{sample_id} {hypo_str}\n')
                         print('H-{}\t{}\t{}'.format(sample_id, hypo['score'], hypo_str))
                         print('P-{}\t{}'.format(
                             sample_id,

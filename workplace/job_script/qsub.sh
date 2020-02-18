@@ -35,7 +35,7 @@ shift `expr ${OPTIND} - 1`
 [[ ${CHECK_o}${CHECK_e}${CHECK_c} != truetrue && $FAIL_OTHER != true ]] && _usage $0  # Missing required option
 while [ -z $STDOUT ]
 do
-  ls "$SCRIPT_DIR/std"
+  tree -L 2 "$SCRIPT_DIR/std"
   read "STDOUT?Input std out file path (-o): "
   echo ""
 done
