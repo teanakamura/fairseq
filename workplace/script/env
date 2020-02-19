@@ -1,6 +1,0 @@
-EXEC_FILE_PATH=${FAIRSEQ_ROOT}/fairseq/fairseq_cli/
-DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/${CONF[data]}/
-GROUPDISK=/fs1/groups1/gcb50243/nakamura
-SAVE_DIR=${GROUPDISK}/checkpoints/${CONF[data]}/${CONF[model]}/
-USER_DIR=${FAIRSEQ_ROOT}/workplace/user-dir/
-TENSORBOARD_DIR=${FAIRSEQ_ROOT}/workplace/tensorboard-log/${CONF[data]}/${CONF[model]}/log/
