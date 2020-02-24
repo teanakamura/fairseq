@@ -15,6 +15,8 @@ echo "CONFIG FILE: $CONF_FILE"
 
 declare -A CONF # bash>=4.2
 CONF[model]=transformer
+CONF[arch]=transformer
+CONF[task]=translation
 CONF[criterion]=cross_entropy
 CONF[max_source]=512
 CONF[max_target]=512
@@ -50,42 +52,43 @@ echo USER_DIR: ${USER_DIR}
 echo TENSORBOARD_DIR: ${TENSORBOARD_DIR}
 
 #CUDA_VISIBLE_DEVICES=0,2,3 \
-OPTIONAL_ARGS="
-   --save-dir ${SAVE_DIR} \
-   --arch transformer_cov \
-      --max-source-positions ${CONF[max_source]} \
-      --max-target-positions ${CONF[max_target]} \
-   --task translation \
-     --truncate-source \
-   --ddp-backend=no_c10d \
-   --criterion ${CONF[criterion]} \
-   --optimizer adam \
-      --adam-betas (0.9,0.98) \
-   --lr ${CONF[lr]} \
-   --lr-scheduler inverse_sqrt \
-   --min-lr ${CONF[min_lr]} \
-   --warmup-updates ${CONF[warmup_updates]} \
-   --warmup-init-lr ${CONF[warmup_init_lr]} \
-   --dropout ${CONF[dropout]} \
-   --weight-decay ${CONF[weight_decay]} \
-   --decoder-learned-pos \
-   --encoder-learned-pos \
-   --log-format simple \
-   --log-interval 1000 \
-   --fixed-validation-seed 7 \
-   --max-tokens ${CONF[max_tokens]} \
-   --max-sentences ${CONF[max_sentences]} \
-   --update-freq ${CONF[update_freq]} \
-   --save-interval-updates 20000 \
-   --max-update ${CONF[max_update]} \
-   --skip-invalid-size-inputs-valid-test \
-   --user-dir ${USER_DIR} \
-   --keep-last-epochs ${CONF[keep_last_epochs]}\
-   --truncate-source \
-   --tensorboard-logdir ${TENSORBOARD_DIR} \
-"
+OPTIONAL_ARGS=(
+   --save-dir ${SAVE_DIR}
+   --arch ${CONF[arch]}
+      --max-source-positions ${CONF[max_source]}
+      --max-target-positions ${CONF[max_target]}
+   --task ${CONF[task]}
+     --truncate-source
+   --ddp-backend=no_c10d
+   --criterion ${CONF[criterion]}
+   --optimizer adam
+      --adam-betas "(0.9,0.98)"
+   --lr ${CONF[lr]}
+   --lr-scheduler inverse_sqrt
+   --min-lr ${CONF[min_lr]}
+   --warmup-updates ${CONF[warmup_updates]}
+   --warmup-init-lr ${CONF[warmup_init_lr]}
+   --dropout ${CONF[dropout]}
+   --weight-decay ${CONF[weight_decay]}
+   --decoder-learned-pos
+   --encoder-learned-pos
+   --log-format simple
+   --log-interval 1000
+   --fixed-validation-seed 7
+   --max-tokens ${CONF[max_tokens]}
+   --max-sentences ${CONF[max_sentences]}
+   --update-freq ${CONF[update_freq]}
+   --save-interval-updates 20000
+   --max-update ${CONF[max_update]}
+   --skip-invalid-size-inputs-valid-test
+   --user-dir ${USER_DIR}
+   --keep-last-epochs ${CONF[keep_last_epochs]}
+   --truncate-source
+   --tensorboard-logdir ${TENSORBOARD_DIR}
+)
 if ${CONF[fp16]}; then
-  OPTIONAL_ARGS="$OPTIONAL_ARGS --fp16"
+  OPTIONAL_ARGS+=--fp16
 fi
-echo $OPTIONAL_ARGS
+# echo $OPTIONAL_ARGS
+echo "python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}"
 python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}
