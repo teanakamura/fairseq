@@ -53,7 +53,7 @@ do
 done
 
 cd $SCRIPT_DIR
-JOB_SCRIPT=~/fairseq/workplace/job_script/job.sh
+JOB_SCRIPT=${JOB_SCRIPT:=~/fairseq/workplace/job_script/job.sh}
 echo "qsub -o std/$STDOUT $JOB_SCRIPT $EXE $CONFIG"
 qsub -o std/$STDOUT $JOB_SCRIPT $EXE $CONFIG
 
