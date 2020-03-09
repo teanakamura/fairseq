@@ -23,12 +23,8 @@ do
 done < $CONF_DIR/$CONF_FILE
 CONF_FILE=
 
-EXEC_FILE_PATH=${FAIRSEQ_ROOT}/workplace/script/
-DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/${CONF[data]}/
-GROUPDISK=/fs1/groups1/gcb50243/nakamura
-SAVE_DIR=${GROUPDISK}/checkpoints/${CONF[data]}/${CONF[model]}/checkpoint${CONF[checkpoint]}.pt
-USER_DIR=${FAIRSEQ_ROOT}/workplace/user-dir/
-OUT_DIR=${FAIRSEQ_ROOT}/workplace/generation/${CONF[data]}/${CONF[model]}${CONF[checkpoint]}
+ENV_FILE=${FAIRSEQ_ROOT}/workplace/script/env
+source ${ENV_FILE}
 if [ ${CONF[data]: -7} == subword ]; then
   SYSTEM=system_output-subword.txt
   REFERENCE=reference-subword.txt
@@ -40,9 +36,9 @@ fi
 mkdir -p ${OUT_DIR}
 
 #CUDA_VISIBLE_DEVICES=7,8,9 \
-   python ${EXEC_FILE_PATH}generate.py ${DATA_DIR} \
+   python ${EXEC_GEN_FILE_PATH}generate.py ${DATA_DIR} \
    --gen-subset test \
-   --path ${SAVE_DIR} \
+   --path ${SAVE_FILE} \
    --beam 5 \
    --task translation \
       --iter-decode-max-iter 30 \
