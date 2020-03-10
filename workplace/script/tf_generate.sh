@@ -25,7 +25,7 @@ CONF_FILE=
 
 ENV_FILE=${FAIRSEQ_ROOT}/workplace/script/env
 source ${ENV_FILE}
-if [ ${CONF[data]: -7} == subword ]; then
+if [[ ${CONF[data]: -7} == subword ]]; then
   SYSTEM=system_output-subword.txt
   REFERENCE=reference-subword.txt
 else
@@ -36,7 +36,7 @@ fi
 mkdir -p ${OUT_DIR}
 
 #CUDA_VISIBLE_DEVICES=7,8,9 \
-   python ${EXEC_GEN_FILE_PATH}generate.py ${DATA_DIR} \
+   python ${EXEC_GEN_FILE_PATH}generate.py ${GEN_DATA_DIR} \
    --gen-subset test \
    --path ${SAVE_FILE} \
    --beam 5 \
@@ -58,3 +58,4 @@ if [ ${CONF[data]: -7} == subword ]; then
   sed -r 's/(@@ )|(@@ ?$)//g' reference-subword.txt > reference.txt
 fi
 
+unset CONF

@@ -92,3 +92,4 @@ fi
 # echo $OPTIONAL_ARGS
 echo "python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}"
 python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}
+unset CONF

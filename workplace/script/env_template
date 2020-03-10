@@ -1,11 +1,12 @@
-EXEC_FILE_PATH=${FAIRSEQ_ROOT}/fairseq/fairseq_cli/
-DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/${CONF[data]}/
-GROUPDISK=/gs/hs0/tga-nlp-titech/nakamura
-SAVE_DIR=${GROUPDISK}/checkpoints/${CONF[data]}/${CONF[model]}/
-USER_DIR=${FAIRSEQ_ROOT}/workplace/user-dir/
-TENSORBOARD_DIR=${FAIRSEQ_ROOT}/workplace/tensorboard-log/${CONF[data]}/${CONF[model]}/log/
+EXEC_FILE_PATH=
+DATA_DIR=
+GROUPDISK=
+SAVE_DIR=
+USER_DIR=
+TENSORBOARD_DIR=
 
 # for generate
-EXEC_GEN_FILE_PATH=${FAIRSEQ_ROOT}/workplace/script/
-SAVE_FILE=${GROUPDISK}/checkpoints/${CONF[data]}/${CONF[model]}/checkpoint${CONF[checkpoint]}.pt
-OUT_DIR=${FAIRSEQ_ROOT}/workplace/generation/${CONF[data]}/${CONF[model]}${CONF[checkpoint]}
+GEN_DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/${CONF[gen_data]:-${CONF[data]}}
+EXEC_GEN_FILE_PATH=
+SAVE_FILE=
+OUT_DIR=
