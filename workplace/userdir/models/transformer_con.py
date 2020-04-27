@@ -2,7 +2,6 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-
 from collections import namedtuple
 import math
 
@@ -27,13 +26,14 @@ from fairseq.modules import (
     TransformerEncoderLayer,
 )
 import random
+from fairseq.models.transformer import TransformerModel
 
 DEFAULT_MAX_SOURCE_POSITIONS = 1024
 DEFAULT_MAX_TARGET_POSITIONS = 1024
 
 
-@register_model('transformer')
-class TransformerModel(FairseqEncoderDecoderModel):
+@register_model('transformer_con')
+class TransformerConModel(FairseqEncoderDecoderModel):
     """
     Transformer model from `"Attention Is All You Need" (Vaswani, et al, 2017)
     <https://arxiv.org/abs/1706.03762>`_.
@@ -181,6 +181,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
             args.max_target_positions = DEFAULT_MAX_TARGET_POSITIONS
 
         src_dict, tgt_dict = task.source_dictionary, task.target_dictionary
+        add_dict = task.add_dict
 
         def build_embedding(dictionary, embed_dim, path=None):
             num_embeddings = len(dictionary)
@@ -208,19 +209,22 @@ class TransformerModel(FairseqEncoderDecoderModel):
             args.share_decoder_input_output_embed = True
         else:
             encoder_embed_tokens = build_embedding(
-                src_dict, args.encoder_embed_dim, args.encoder_embed_path
+                src_dict, args.encoder_embed_dim-1, args.encoder_embed_path
             )
             decoder_embed_tokens = build_embedding(
                 tgt_dict, args.decoder_embed_dim, args.decoder_embed_path
             )
+            embed_additional_tokens = build_embedding(
+                add_dict, 1, None
+            )
 
-        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens)
+        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, embed_additional_tokens)
         decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens)
         return cls(args, encoder, decoder)
 
     @classmethod
-    def build_encoder(cls, args, src_dict, embed_tokens):
-        return TransformerEncoder(args, src_dict, embed_tokens)
+    def build_encoder(cls, args, src_dict, embed_tokens, embed_add_tokens):
+        return TransformerEncoder(args, src_dict, embed_tokens, embed_add_tokens)
 
     @classmethod
     def build_decoder(cls, args, tgt_dict, embed_tokens):
@@ -232,7 +236,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         )
 
 
-@register_model('transformer_align')
+##@register_model('transformer_align')
 class TransformerAlignModel(TransformerModel):
     """
     See "Jointly Learning to Align and Translate with Transformer
@@ -314,18 +318,19 @@ class TransformerEncoder(FairseqEncoder):
         embed_tokens (torch.nn.Embedding): input embedding
     """
 
-    def __init__(self, args, dictionary, embed_tokens):
+    def __init__(self, args, dictionary, embed_tokens, embed_add_tokens):
         super().__init__(dictionary)
         self.register_buffer('version', torch.Tensor([3]))
 
         self.dropout = args.dropout
         self.encoder_layerdrop = args.encoder_layerdrop
 
-        embed_dim = embed_tokens.embedding_dim
+        embed_dim = embed_tokens.embedding_dim + 1
         self.padding_idx = embed_tokens.padding_idx
         self.max_source_positions = args.max_source_positions
 
         self.embed_tokens = embed_tokens
+        self.embed_add_tokens = embed_add_tokens
 
         self.embed_scale = 1.0 if args.no_scale_embedding else math.sqrt(embed_dim)
 
@@ -351,9 +356,12 @@ class TransformerEncoder(FairseqEncoder):
         else:
             self.layernorm_embedding = None
 
-    def forward_embedding(self, src_tokens):
+    def forward_embedding(self, src_tokens, add_tokens):
         # embed tokens and positions
-        x = embed = self.embed_scale * self.embed_tokens(src_tokens)
+        # x = embed = self.embed_scale * self.embed_tokens(src_tokens)
+        a = self.embed_tokens(src_tokens)
+        b = self.embed_add_tokens(add_tokens)
+        x = embed = self.embed_scale * torch.cat([a, b], dim=-1)
         if self.embed_positions is not None:
             x = embed + self.embed_positions(src_tokens)
         if self.layernorm_embedding:
@@ -361,7 +369,7 @@ class TransformerEncoder(FairseqEncoder):
         x = F.dropout(x, p=self.dropout, training=self.training)
         return x, embed
 
-    def forward(self, src_tokens, src_lengths, cls_input=None, return_all_hiddens=False, **unused):
+    def forward(self, src_tokens, src_lengths, additional_data, cls_input=None, return_all_hiddens=False, **unused):
         """
         Args:
             src_tokens (LongTensor): tokens in the source language of shape
@@ -385,8 +393,8 @@ class TransformerEncoder(FairseqEncoder):
         """
         if self.layer_wise_attention:
             return_all_hiddens = True
-
-        x, encoder_embedding = self.forward_embedding(src_tokens)
+        
+        x, encoder_embedding = self.forward_embedding(src_tokens, additional_data)
 
         # B x T x C -> T x B x C
         x = x.transpose(0, 1)
@@ -782,7 +790,7 @@ def Linear(in_features, out_features, bias=True):
     return m
 
 
-@register_model_architecture('transformer', 'transformer')
+@register_model_architecture('transformer_con', 'transformer_con')
 def base_architecture(args):
     args.encoder_embed_path = getattr(args, 'encoder_embed_path', None)
     args.encoder_embed_dim = getattr(args, 'encoder_embed_dim', 512)
@@ -819,7 +827,7 @@ def base_architecture(args):
     args.layernorm_embedding = getattr(args, 'layernorm_embedding', False)
 
 
-@register_model_architecture('transformer', 'transformer_iwslt_de_en')
+#@register_model_architecture('transformer', 'transformer_iwslt_de_en')
 def transformer_iwslt_de_en(args):
     args.encoder_embed_dim = getattr(args, 'encoder_embed_dim', 512)
     args.encoder_ffn_embed_dim = getattr(args, 'encoder_ffn_embed_dim', 1024)
@@ -832,13 +840,13 @@ def transformer_iwslt_de_en(args):
     base_architecture(args)
 
 
-@register_model_architecture('transformer', 'transformer_wmt_en_de')
+#@register_model_architecture('transformer', 'transformer_wmt_en_de')
 def transformer_wmt_en_de(args):
     base_architecture(args)
 
 
 # parameters used in the "Attention Is All You Need" paper (Vaswani et al., 2017)
-@register_model_architecture('transformer', 'transformer_vaswani_wmt_en_de_big')
+#@register_model_architecture('transformer', 'transformer_vaswani_wmt_en_de_big')
 def transformer_vaswani_wmt_en_de_big(args):
     args.encoder_embed_dim = getattr(args, 'encoder_embed_dim', 1024)
     args.encoder_ffn_embed_dim = getattr(args, 'encoder_ffn_embed_dim', 4096)
@@ -851,20 +859,20 @@ def transformer_vaswani_wmt_en_de_big(args):
     base_architecture(args)
 
 
-@register_model_architecture('transformer', 'transformer_vaswani_wmt_en_fr_big')
+#@register_model_architecture('transformer', 'transformer_vaswani_wmt_en_fr_big')
 def transformer_vaswani_wmt_en_fr_big(args):
     args.dropout = getattr(args, 'dropout', 0.1)
     transformer_vaswani_wmt_en_de_big(args)
 
 
-@register_model_architecture('transformer', 'transformer_wmt_en_de_big')
+#@register_model_architecture('transformer', 'transformer_wmt_en_de_big')
 def transformer_wmt_en_de_big(args):
     args.attention_dropout = getattr(args, 'attention_dropout', 0.1)
     transformer_vaswani_wmt_en_de_big(args)
 
 
 # default parameters used in tensor2tensor implementation
-@register_model_architecture('transformer', 'transformer_wmt_en_de_big_t2t')
+#@register_model_architecture('transformer', 'transformer_wmt_en_de_big_t2t')
 def transformer_wmt_en_de_big_t2t(args):
     args.encoder_normalize_before = getattr(args, 'encoder_normalize_before', True)
     args.decoder_normalize_before = getattr(args, 'decoder_normalize_before', True)
@@ -873,7 +881,7 @@ def transformer_wmt_en_de_big_t2t(args):
     transformer_vaswani_wmt_en_de_big(args)
 
 
-@register_model_architecture('transformer_align', 'transformer_align')
+#@register_model_architecture('transformer_align', 'transformer_align')
 def transformer_align(args):
     args.alignment_heads = getattr(args, 'alignment_heads', 1)
     args.alignment_layer = getattr(args, 'alignment_layer', 4)
@@ -881,7 +889,7 @@ def transformer_align(args):
     base_architecture(args)
 
 
-@register_model_architecture('transformer_align', 'transformer_wmt_en_de_big_align')
+#@register_model_architecture('transformer_align', 'transformer_wmt_en_de_big_align')
 def transformer_wmt_en_de_big_align(args):
     args.alignment_heads = getattr(args, 'alignment_heads', 1)
     args.alignment_layer = getattr(args, 'alignment_layer', 4)

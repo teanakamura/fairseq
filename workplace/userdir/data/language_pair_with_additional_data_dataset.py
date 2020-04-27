@@ -6,7 +6,7 @@
 import numpy as np
 import torch
 
-from . import data_utils, FairseqDataset
+from fairseq.data import data_utils, FairseqDataset
 
 
 def collate(
@@ -72,6 +72,12 @@ def collate(
     else:
         ntokens = sum(len(s['source']) for s in samples)
 
+    additional_data = None
+    if samples[0].get('additional_data', None) is not None:
+        additional_data = merge('additional_data', left_pad=left_pad_target)
+        additional_data = additional_data.index_select(0, sort_order)
+        assert additional_data.shape == src_tokens.shape
+
     batch = {
         'id': id,
         'nsentences': len(samples),
@@ -79,6 +85,7 @@ def collate(
         'net_input': {
             'src_tokens': src_tokens,
             'src_lengths': src_lengths,
+            'additional_data': additional_data,
         },
         'target': target,
     }
@@ -113,7 +120,7 @@ def collate(
     return batch
 
 
-class LanguagePairDataset(FairseqDataset):
+class LanguagePairWithAdditionalDataDataset(FairseqDataset):
     """
     A pair of torch.utils.data.Datasets.
 
@@ -149,12 +156,13 @@ class LanguagePairDataset(FairseqDataset):
     def __init__(
         self, src, src_sizes, src_dict,
         tgt=None, tgt_sizes=None, tgt_dict=None,
+        add=None, add_sizes=None, add_dict=None,
         left_pad_source=True, left_pad_target=False,
         max_source_positions=1024, max_target_positions=1024,
         shuffle=True, input_feeding=True,
         remove_eos_from_source=False, append_eos_to_target=False,
         align_dataset=None,
-        append_bos=False
+        append_bos=False,
     ):
         if tgt_dict is not None:
             assert src_dict.pad() == tgt_dict.pad()
@@ -162,10 +170,13 @@ class LanguagePairDataset(FairseqDataset):
             assert src_dict.unk() == tgt_dict.unk()
         self.src = src
         self.tgt = tgt
+        self.add = add
         self.src_sizes = np.array(src_sizes)
         self.tgt_sizes = np.array(tgt_sizes) if tgt_sizes is not None else None
+        self.add_sizes = np.array(add_sizes) if tgt_sizes is not None else None
         self.src_dict = src_dict
         self.tgt_dict = tgt_dict
+        self.add_dict = add_dict
         self.left_pad_source = left_pad_source
         self.left_pad_target = left_pad_target
         self.max_source_positions = max_source_positions
@@ -182,6 +193,7 @@ class LanguagePairDataset(FairseqDataset):
     def __getitem__(self, index):
         tgt_item = self.tgt[index] if self.tgt is not None else None
         src_item = self.src[index]
+        add_item = self.add[index] if self.add is not None else None
         # Append EOS to end of tgt sentence if it does not have an EOS and remove
         # EOS from end of src sentence if it exists. This is useful when we use
         # use existing datasets for opposite directions i.e., when we want to
@@ -209,6 +221,7 @@ class LanguagePairDataset(FairseqDataset):
             'id': index,
             'source': src_item,
             'target': tgt_item,
+            'additional_data': add_item,
         }
         if self.align_dataset is not None:
             example['alignment'] = self.align_dataset[index]

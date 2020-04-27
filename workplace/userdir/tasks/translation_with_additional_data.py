@@ -17,11 +17,12 @@ from fairseq.data import (
     StripTokenDataset,
     TruncateDataset,
 )
+from userdir.data import LanguagePairWithAdditionalDataDataset
 
-from . import FairseqTask, register_task
+from fairseq.tasks import FairseqTask, register_task
 
 
-def load_langpair_dataset(
+def load_langpair_with_additional_data_dataset(
     data_path, split,
     src, src_dict,
     tgt, tgt_dict,
@@ -29,6 +30,7 @@ def load_langpair_dataset(
     left_pad_source, left_pad_target, max_source_positions,
     max_target_positions, prepend_bos=False, load_alignments=False,
     truncate_source=False,
+    additional_data=None, add_dict=None,
 ):
     def split_exists(split, src, tgt, lang, data_path):
         filename = os.path.join(data_path, '{}.{}-{}.{}'.format(split, src, tgt, lang))
@@ -91,19 +93,65 @@ def load_langpair_dataset(
         if indexed_dataset.dataset_exists(align_path, impl=dataset_impl):
             align_dataset = data_utils.load_indexed_dataset(align_path, None, dataset_impl)
 
-    return LanguagePairDataset(
-        src_dataset, src_dataset.sizes, src_dict,
-        tgt_dataset, tgt_dataset.sizes, tgt_dict,
-        left_pad_source=left_pad_source,
-        left_pad_target=left_pad_target,
-        max_source_positions=max_source_positions,
-        max_target_positions=max_target_positions,
-        align_dataset=align_dataset,
-    )
+
+    add_datasets = []
+
+    for k in itertools.count():
+        split_k = split + (str(k) if k > 0 else '')
+        add_lang = 'add'
+        additional_data_path = f'{data_path}/additional_data'
+
+        # infer langcode
+        if split_exists(split_k, add_lang, 'None', add_lang, additional_data_path):
+            prefix = os.path.join(additional_data_path, '{}.{}-{}.'.format(split_k, add_lang, 'None'))
+        else:
+            if k > 0:
+                break
+            else:
+                raise FileNotFoundError('Dataset not found: {} ({})'.format(split, additional_data_path))
+
+        add_dataset = data_utils.load_indexed_dataset(prefix + add_lang, add_dict, dataset_impl)
+        add_datasets.append(add_dataset)
+
+        print('| {} {} {}-{} {} examples'.format(data_path, split_k, add_lang, 'None', len(add_datasets[-1])))
+
+        if not combine:
+            break
+
+    if len(add_datasets) == 1:
+        add_dataset = add_datasets[0]
+    else:
+        raise Exception
+        # sample_ratios = [1] * len(src_datasets)
+        # sample_ratios[0] = upsample_primary
+        # src_dataset = ConcatDataset(src_datasets, sample_ratios)
+        # tgt_dataset = ConcatDataset(tgt_datasets, sample_ratios)
+
+    if add_dataset:
+        return LanguagePairWithAdditionalDataDataset(
+            src_dataset, src_dataset.sizes, src_dict,
+            tgt_dataset, tgt_dataset.sizes, tgt_dict,
+            add_dataset, add_dataset.sizes, add_dict,
+            left_pad_source=left_pad_source,
+            left_pad_target=left_pad_target,
+            max_source_positions=max_source_positions,
+            max_target_positions=max_target_positions,
+            align_dataset=align_dataset,
+        )
+    else:
+        return LanguagePairDataset(
+            src_dataset, src_dataset.sizes, src_dict,
+            tgt_dataset, tgt_dataset.sizes, tgt_dict,
+            left_pad_source=left_pad_source,
+            left_pad_target=left_pad_target,
+            max_source_positions=max_source_positions,
+            max_target_positions=max_target_positions,
+            align_dataset=align_dataset,
+        )
 
 
-@register_task('translation')
-class TranslationTask(FairseqTask):
+@register_task('translation_with_additional_data')
+class TranslationWithAdditionalDataTask(FairseqTask):
     """
     Translate from one (source) language to another (target) language.
 
@@ -152,12 +200,14 @@ class TranslationTask(FairseqTask):
                             help='amount to upsample primary dataset')
         parser.add_argument('--truncate-source', default=False, action='store_true',
                             help='boolean to truncate source to max-source-positions')
+        parser.add_argument('--additional-data', default=None)
         # fmt: on
 
-    def __init__(self, args, src_dict, tgt_dict):
+    def __init__(self, args, src_dict, tgt_dict, add_dict):
         super().__init__(args)
         self.src_dict = src_dict
         self.tgt_dict = tgt_dict
+        self.add_dict = add_dict
 
     @classmethod
     def setup_task(cls, args, **kwargs):
@@ -192,7 +242,9 @@ class TranslationTask(FairseqTask):
         print('| [{}] dictionary: {} types'.format(args.source_lang, len(src_dict)))
         print('| [{}] dictionary: {} types'.format(args.target_lang, len(tgt_dict)))
 
-        return cls(args, src_dict, tgt_dict)
+        # add_dict = cls.load_dictionary(os.path.join(paths[0], 'additional_data', 'dict.{}.txt'.format(args.add_lang)))
+        add_dict = cls.load_dictionary(os.path.join(paths[0], 'additional_data', 'dict.add.txt'))
+        return cls(args, src_dict, tgt_dict, add_dict)
 
     def load_dataset(self, split, epoch=0, combine=False, **kwargs):
         """Load a given dataset split.
@@ -207,7 +259,7 @@ class TranslationTask(FairseqTask):
         # infer langcode
         src, tgt = self.args.source_lang, self.args.target_lang
 
-        self.datasets[split] = load_langpair_dataset(
+        self.datasets[split] = load_langpair_with_additional_data_dataset(
             data_path, split, src, self.src_dict, tgt, self.tgt_dict,
             combine=combine, dataset_impl=self.args.dataset_impl,
             upsample_primary=self.args.upsample_primary,
@@ -217,6 +269,8 @@ class TranslationTask(FairseqTask):
             max_target_positions=self.args.max_target_positions,
             load_alignments=self.args.load_alignments,
             truncate_source=self.args.truncate_source,
+            additional_data=self.args.additional_data,
+            add_dict=self.add_dict,
         )
 
     def build_dataset_for_inference(self, src_tokens, src_lengths):
