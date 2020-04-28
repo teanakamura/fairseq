@@ -52,6 +52,7 @@ echo USER_DIR: ${USER_DIR}
 echo TENSORBOARD_DIR: ${TENSORBOARD_DIR}
 
 #CUDA_VISIBLE_DEVICES=0,2,3 \
+## zshの配列でオプショナル引数を作る
 OPTIONAL_ARGS=(
    --save-dir ${SAVE_DIR}
    --arch ${CONF[arch]}
@@ -87,7 +88,12 @@ OPTIONAL_ARGS=(
    --tensorboard-logdir ${TENSORBOARD_DIR}
 )
 if ${CONF[fp16]}; then
-  OPTIONAL_ARGS+=--fp16
+  OPTIONAL_ARGS+='--fp16'
+fi
+if [ -n "${CONF[additional_data]}" ]; then
+  echo "${CONF[additional_data]}"
+  OPTIONAL_ARGS+='--additional-data'
+  OPTIONAL_ARGS+="${FAIRSEQ_ROOT}/${CONF[additional_data]}"
 fi
 # echo $OPTIONAL_ARGS
 echo "python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}"
