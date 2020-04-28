@@ -111,6 +111,14 @@ def load_langpair_with_additional_data_dataset(
                 raise FileNotFoundError('Dataset not found: {} ({})'.format(split, additional_data_path))
 
         add_dataset = data_utils.load_indexed_dataset(prefix + add_lang, add_dict, dataset_impl)
+        if truncate_source:
+            add_dataset = AppendTokenDataset(
+                TruncateDataset(
+                    StripTokenDataset(add_dataset, add_dict.eos()),
+                    max_source_positions - 1,
+                ),
+                add_dict.eos(),
+            )
         add_datasets.append(add_dataset)
 
         print('| {} {} {}-{} {} examples'.format(data_path, split_k, add_lang, 'None', len(add_datasets[-1])))
