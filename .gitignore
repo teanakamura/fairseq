@@ -15,4 +15,4 @@ workplace/script/env
 /fairseq/examples/translation/orig/
 /fairseq/examples/translation/subword-nmt/
 /fairseq/examples/translation/wmt17_en_de/
-
+/fairseq/tests/
