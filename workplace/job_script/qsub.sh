@@ -4,6 +4,9 @@
 _usage() {
   echo "Usage:"
   echo "  source $1 -o STDOUT_FILE -e EXEC_SCRIPT -c CONFIG_FILE\n"
+  STDOUT=
+  EXE=
+  CONFIG=
   #exit 1
 }
 echo $0
