@@ -49,7 +49,6 @@ class KeywordRemover():
         idx, doc = doc.split(None, 1)
         sp_doc = self.sp(doc.rstrip())
         keys = self.keys[int(idx)]
-        #from IPython import embed; embed()
         keys = keys.rstrip()
         first_word_dict = defaultdict(list)
         for vk in keys.split(', '):
@@ -99,7 +98,6 @@ def main(args):
             open(args.reference) as rf:
         for i, (so, re) in enumerate(zip(sf, rf)):
             print(i, end='\r', flush=True)
-            #from IPython import embed; embed()
             if args.keyword:
                 so = kr(so)
                 re = kr(re)
@@ -141,8 +139,8 @@ def parse():
 if __name__ == "__main__":
     args = parse()
     conf = read_config(args.config)
-    gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{conf["data"]}/{conf["model"]}{conf["checkpoint"]}'
+    data = conf.get('gen_data') or conf['data']
+    gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{data}/{conf["model"]}{conf["checkpoint"]}'
     args.system_out = args.system_out or f'{gen_path}/system_output.txt'
     args.reference = args.reference or f'{gen_path}/reference.txt'
-    #from IPython import embed; embed()
     main(args)

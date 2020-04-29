@@ -51,11 +51,12 @@ mkdir -p ${OUT_DIR}
    --reference ${OUT_DIR}/${REFERENCE} \
    --user-dir ${USER_DIR}
 
-if [ ${CONF[data]: -7} == subword ]; then
+if [ ${CONF[data]: -7} = subword ]; then
   CURRENT_DIR=`pwd`
   cd $OUT_DIR
   sed -r 's/(@@ )|(@@ ?$)//g' system_output-subword.txt > system_output.txt
   sed -r 's/(@@ )|(@@ ?$)//g' reference-subword.txt > reference.txt
+  cd ${CURRENT_DIR}
 fi
 
 unset CONF
