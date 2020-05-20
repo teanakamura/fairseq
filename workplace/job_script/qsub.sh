@@ -3,30 +3,30 @@
 
 _usage() {
   echo "Usage:"
-  echo "  source $1 -o STDOUT_FILE -e EXEC_SCRIPT -c CONFIG_FILE\n"
-  STDOUT=
-  EXE=
-  CONFIG=
+  echo "  source qsub.sh -o STDOUT_FILE -e EXEC_SCRIPT -c CONFIG_FILE\n"
   #exit 1
 }
 echo $0
-echo $1
 
 CURRENT_DIR=`pwd`
 SCRIPT_DIR=`dirname $0`
-
-while getopts o:e:c: OPT;
+CHECK_o=; CHECK_e=; CHECK_c=; FAIL_OTHER=;
+STDOUT=; EXE=; CONFIG=;
+OPTIND=1
+while getopts o:e:c: OPT
 do
   case ${OPT} in
     o) CHECK_o=true
        STDOUT=${OPTARG}
-       echo $STDOUT
+       echo "STDOUT: $STDOUT"
        ;;
     e) CHECK_e=true
        EXE=${OPTARG}
+       echo "EXE: $EXE"
        ;;
     c) CHECK_c=true
        CONFIG=${OPTARG}
+       echo "CONFIG: $CONFIG"
        ;;
     :|\?) FAIL_OTHER=true  # Missing required argument | Invalid option
           _usage $0
@@ -34,8 +34,9 @@ do
   esac
 done
 shift `expr ${OPTIND} - 1`
+echo ""
 
-[[ ${CHECK_o}${CHECK_e}${CHECK_c} != truetrue && $FAIL_OTHER != true ]] && _usage $0  # Missing required option
+[[ ${CHECK_o}${CHECK_e}${CHECK_c} != truetruetrue && $FAIL_OTHER != true ]] && _usage $0  # Missing required option
 while [ -z $STDOUT ]
 do
   tree -L 2 "$SCRIPT_DIR/std"
