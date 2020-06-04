@@ -87,6 +87,7 @@ class KeywordRemover():
         return ' '.join(res)
 
 def main(args):
+    id_list = []
     rougeone_list = []
     rougetwo_list = []
     rougel_list = []
@@ -101,12 +102,21 @@ def main(args):
             if args.keyword:
                 so = kr(so)
                 re = kr(re)
+            else:
+                idx, so = so.split(None, 1)
+                idx, re = re.split(None, 1)
+            id_list.append(int(idx))
             rougeone_list.append(rouge4one.rouge_1(summary=so, references=re, alpha=args.alpha))
             rougetwo_list.append(rouge4other.rouge_2(summary=so, references=re, alpha=args.alpha))
             rougel_list.append(rouge4one.rouge_l(summary=so, references=re, alpha=args.alpha))
+    lowest_idids = np.argpartition(rougeone_list, 100)[:100]
+    print(f"Lowest IDs\t{' '.join(map(str, np.array(id_list)[lowest_idids]))}")
     print('ROUGE-1\t%.6f'%(np.average(rougeone_list)))
     print('ROUGE-2\t%.6f'%(np.average(rougetwo_list)))
     print('ROUGE-L\t%.6f'%(np.average(rougel_list)))
+    with open(args.output, 'w') as of:
+        for idx, r1, r2, rl in zip(id_list, rougeone_list, rougetwo_list, rougel_list):
+            of.write(f'{idx}, {r1}, {r2}, {rl}\n')
   
    # system_out_list = read_file(args.system_out, args.remove_bpe)
    # reference_list = read_file(args.reference, args.remove_bpe)
@@ -128,6 +138,7 @@ def parse():
     parser.add_argument('-r', '--reference', dest='reference',
         default=None,
         help='specify the reference file name')
+    parser.add_argument('-o', '--output', default=None)
     parser.add_argument('-l', '--lang', default='en')
     parser.add_argument('--alpha', type=float, default=0.5)
     parser.add_argument('--remove-bpe', default=None)
@@ -143,4 +154,5 @@ if __name__ == "__main__":
     gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{data}/{conf["model"]}{conf["checkpoint"]}'
     args.system_out = args.system_out or f'{gen_path}/system_output.txt'
     args.reference = args.reference or f'{gen_path}/reference.txt'
+    args.output = args.output or f'{gen_path}/rougeout.txt'
     main(args)
