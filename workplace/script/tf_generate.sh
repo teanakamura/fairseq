@@ -49,6 +49,7 @@ mkdir -p ${OUT_DIR}
    --min-len 5 \
    --system ${OUT_DIR}/${SYSTEM} \
    --reference ${OUT_DIR}/${REFERENCE} \
+   --truncate-source \
    --user-dir ${USER_DIR}
 
 if [ ${CONF[data]: -7} = subword ]; then
