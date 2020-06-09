@@ -32,6 +32,8 @@ CONF[update_freq]=4
 CONF[max_update]=300000
 CONF[keep_last_epochs]=3
 CONF[fp16]=true
+CONF[cpu]=false
+CONF[reset_optimizer]=false
 
 while read line
 do
@@ -89,6 +91,12 @@ OPTIONAL_ARGS=(
 )
 if ${CONF[fp16]}; then
   OPTIONAL_ARGS+='--fp16'
+fi
+if ${CONF[cpu]}; then
+  OPTIONAL_ARGS+='--cpu'
+fi
+if ${CONF[reset_optimizer]}; then
+  OPTIONAL_ARGS+='--reset-optimizer'
 fi
 if [ -n "${CONF[additional_data]}" ]; then
   echo "${CONF[additional_data]}"
