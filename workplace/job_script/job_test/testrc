@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo 'execute testrc'
+PATH=$PATH:~/.local/bin  #もともと環境変数なので環境変数として更新される
+SHELLVAR='shell'  #シェル変数
+export ENVVAR='environment'  #環境変数
