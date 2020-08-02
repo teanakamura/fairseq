@@ -1,0 +1,4 @@
+export PATH=$PATH:~/.local/bin
+export FAIRSEQ_ROOT=~/fairseq
+export GROUPDISK=/fs1/groups1/gcb50243/nakamura
+
