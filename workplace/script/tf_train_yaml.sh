@@ -14,7 +14,6 @@ update_conf () {
 
 
 echo ${JOB_ID}
-echo $PATH
 
 
 CONF_DIR=${FAIRSEQ_ROOT}/workplace/script/yaml_configs
@@ -68,7 +67,9 @@ OPTIONAL_ARGS=(
    --max-sentences ${CONF[io_max_sentences]}
    --update-freq ${CONF[update_freq]}
    --save-interval-updates 20000
+   --clip-norm ${CONF[clip_norm]}
    --max-update ${CONF[update_max]}
+   --max-epoch ${CONF[max_epoch]}
    --skip-invalid-size-inputs-valid-test
    --user-dir ${USER_DIR}
    --keep-last-epochs ${CONF[keep_last_epochs]}
@@ -84,8 +85,15 @@ fi
 if ${CONF[reset_optimizer]}; then
   OPTIONAL_ARGS+='--reset-optimizer'
 fi
+if [ -n "${CONF[seed]}" ]; then
+  OPTIONAL_ARGS+='--seed'
+  OPTIONAL_ARGS+=${CONF[seed]}
+fi
+if [ -n "${CONF[model_criterion_label_smoothing]}" ]; then
+  OPTIONAL_ARGS+='--label-smoothing'
+  OPTIONAL_ARGS+=${CONF[model_criterion_label_smoothing]}
+fi
 if [ -n "${CONF[additional_data]}" ]; then
-  echo "${CONF[additional_data]}"
   OPTIONAL_ARGS+='--additional-data'
   OPTIONAL_ARGS+="${FAIRSEQ_ROOT}/${CONF[additional_data]}"
 fi
