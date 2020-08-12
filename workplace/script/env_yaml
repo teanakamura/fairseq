@@ -1,0 +1,15 @@
+#!/bin/sh
+
+EXEC_FILE_PATH=${FAIRSEQ_ROOT}/fairseq/fairseq_cli/
+DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/$DATA/${CONF[data_type]}/
+
+SAVE_DIR=${GROUPDISK}/checkpoints/$DATA/${CONF[data_type]}/${CONF[model]}/
+USER_DIR=${FAIRSEQ_ROOT}/workplace/userdir/
+TENSORBOARD_DIR=${FAIRSEQ_ROOT}/workplace/tensorboard-log/${CONF[data]}/${CONF[model]}/log/
+
+# for generate
+# GEN_DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/${CONF[gen_data]:-${CONF[data]}}/
+GEN_DATA_DIR=${FAIRSEQ_ROOT}/workplace/data-bin/$DATA/${CONF[data_type]}/${CONF[gen_data]}/
+EXEC_GEN_FILE_PATH=${FAIRSEQ_ROOT}/workplace/script/
+SAVE_FILE=${SAVE_DIR}/checkpoint${CONF[checkpoint]}.pt
+OUT_DIR=${FAIRSEQ_ROOT}/workplace/generation/$DATA/${CONF[data_type]}/${CONF[model]}${CONF[checkpoint]}/${CONF[gen_data]}
