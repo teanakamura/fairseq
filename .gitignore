@@ -5,6 +5,8 @@ workplace**/*log
 workplace/generation/*
 workplace/job_script/std/*
 workplace/script/env
+workplace/script/configs
+workplace/script/yaml_configs
 # workplace/script/configs
 **__pycache__
 !/fairseq/fairseq/**
