@@ -42,10 +42,10 @@ done
 eval $(parse_yaml $yml_path/$YML.yml)
 echo $yml_path/$YML.yml
 
-DATA_NAME=$data_name
-DATA_TYPE=$data_type
-DATA_DIR=$HOME/Data/$DATA_NAME/$DATA_TYPE
-DEST_DIR=$SCRIPT_DIR/../data-bin/$DATA_NAME/$DATA_TYPE
+DATA_DIR=$HOME/Data/$data_name/$data_type
+echo DATA_DIR: $DATA_DIR
+DEST_DIR=$SCRIPT_DIR/../data-bin/$data_name/${dest_dir:-$data_type}
+echo DEST_DIR: $DEST_DIR
 
 python ${EXEC_FILE_PATH}preprocess.py \
   --task translation \
