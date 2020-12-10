@@ -1,34 +1,17 @@
-#!/bin/zsh
+#!/bin/bash
 
-update_conf () {
-  parse_yaml $1 |
-  while read line
-  do
-    if echo $line | grep -F = &>/dev/null
-    then
-      varname=$(echo "$line" | cut -d '=' -f 1)
-      CONF[$varname]=$(echo "$line" | cut -d '=' -f 2- | sed -e 's/^"//' -e 's/"$//' )
-    fi
-  done
-}
+echo $JOB_ID
 
+SCRIPT_DIR=`dirname $0`
+SH_UTILS_DIR=$SCRIPT_DIR/../sh_utils
+YAML_ROOT_PATH=$SCRIPT_DIR/yaml_configs
 
-echo ${JOB_ID}
+declare -A CONF
+eval CONF=(`$SH_UTILS_DIR/load_yaml.sh $YAML_ROOT_PATH $1/$2`)
 
-
-CONF_DIR=${FAIRSEQ_ROOT}/workplace/script/yaml_configs
-DATA=$1
-CONF_FILE=$2
-
-
-declare -A CONF # bash>=4.2
-update_conf $CONF_DIR/default.yml
-update_conf $CONF_DIR/$DATA/default.yml
-update_conf $CONF_DIR/$DATA/$CONF_FILE
-for key in ${(k)CONF[@]}; do  # zsh
-  echo "$key: ${CONF[$key]}"
+for k in ${!CONF[@]}; do
+  echo $k: ${CONF[$k]}
 done
-
 
 ENV_FILE=${FAIRSEQ_ROOT}/workplace/script/env_yaml
 source ${ENV_FILE}
@@ -39,7 +22,7 @@ echo USER_DIR: ${USER_DIR}
 echo TENSORBOARD_DIR: ${TENSORBOARD_DIR}
 
 # #CUDA_VISIBLE_DEVICES=0,2,3 \
-# ## zshの配列でオプショナル引数を作る
+declare -a OPTIONAL_ARGS
 OPTIONAL_ARGS=(
    --save-dir ${SAVE_DIR}
    --arch ${CONF[model_arch]}
@@ -47,7 +30,7 @@ OPTIONAL_ARGS=(
       --max-target-positions ${CONF[io_max_tgt]}
    --task ${CONF[model_task]}
      --truncate-source
-   --ddp-backend=no_c10d
+   --ddp-backend no_c10d
    --criterion ${CONF[model_criterion]}
    --optimizer adam
       --adam-betas "(0.9,0.98)"
@@ -75,29 +58,48 @@ OPTIONAL_ARGS=(
    --keep-last-epochs ${CONF[keep_last_epochs]}
    --truncate-source
    --tensorboard-logdir ${TENSORBOARD_DIR}
+   --source-lang ${CONF[lang_src]}
+   --target-lang ${CONF[lang_tgt]}
 )
-if ${CONF[fp16]}; then
-  OPTIONAL_ARGS+='--fp16'
-fi
-if ${CONF[cpu]}; then
-  OPTIONAL_ARGS+='--cpu'
-fi
-if ${CONF[reset_optimizer]}; then
-  OPTIONAL_ARGS+='--reset-optimizer'
-fi
-if [ -n "${CONF[seed]}" ]; then
-  OPTIONAL_ARGS+='--seed'
-  OPTIONAL_ARGS+=${CONF[seed]}
-fi
+
+BOOLEAN_OPTIONS=(fp16 cpu reset_optimizer share_all_embeddings)
+for option in ${BOOLEAN_OPTIONS[@]}; do
+  if ${CONF[$option]}; then
+    OPTIONAL_ARGS+=(--${option//_/-})
+  fi
+done
+# if ${CONF[fp16]}; then
+#   OPTIONAL_ARGS+=('--fp16')
+# fi
+# if ${CONF[cpu]}; then
+#   OPTIONAL_ARGS+=('--cpu')
+# fi
+# if ${CONF[reset_optimizer]}; then
+#   OPTIONAL_ARGS+=(OPTIONAL_ARGS'--reset-optimizer')
+# fi
+PARAM_OPTIONS=(seed fp16_scale_tolerance add_dir add_lang)
+for option in ${PARAM_OPTIONS[@]}; do
+  if [ -n "${CONF[$option]}" ]; then
+    OPTIONAL_ARGS+=(--${option//_/-})
+    OPTIONAL_ARGS+=(${CONF[$option]})
+  fi
+done
+# if [ -n "${CONF[seed]}" ]; then
+#   OPTIONAL_ARGS+=('--seed')
+#   OPTIONAL_ARGS+=(${CONF[seed]})
+# fi
 if [ -n "${CONF[model_criterion_label_smoothing]}" ]; then
-  OPTIONAL_ARGS+='--label-smoothing'
-  OPTIONAL_ARGS+=${CONF[model_criterion_label_smoothing]}
+  OPTIONAL_ARGS+=('--label-smoothing')
+  OPTIONAL_ARGS+=(${CONF[model_criterion_label_smoothing]})
 fi
-if [ -n "${CONF[additional_data]}" ]; then
-  OPTIONAL_ARGS+='--additional-data'
-  OPTIONAL_ARGS+="${FAIRSEQ_ROOT}/${CONF[additional_data]}"
-fi
-# echo $OPTIONAL_ARGS
-echo "python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}"
-python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS}
+# if [ -n "${CONF[additional_data]}" ]; then
+#   OPTIONAL_ARGS+=('--additional-data')
+#   OPTIONAL_ARGS+=("${FAIRSEQ_ROOT}/${CONF[additional_data]}")
+# fi
+
+# for elem in ${OPTIONAL_ARGS[@]}; do
+#   echo $elem
+# done
+echo "python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS[@]}"
+python ${EXEC_FILE_PATH}train.py ${DATA_DIR} ${OPTIONAL_ARGS[@]}
 unset CONF
