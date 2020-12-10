@@ -13,9 +13,8 @@ pwd
 
 ## load jobrc
 source ~/fairseq/workplace/job_script/jobrc
-echo $PATH
 
 ## Initialize module
 source ~/fairseq/workplace/job_script/module_load.sh
 
-zsh ~/fairseq/workplace/script/$1 $2 $3
+~/fairseq/workplace/script/$1 $2 $3

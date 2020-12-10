@@ -19,3 +19,24 @@ SHELL VARIABLE:
 ENVIRONMENTAL VARIABLE: environment
 PID/BASHPID/PPID: 254537/254537/254529
 1 2 3
+MAIN
+PATH: /tmp/3782407.1.gpu:/usr/local/bin:/bin:/usr/bin
+execute testrc
+PATH: /tmp/3782407.1.gpu:/usr/local/bin:/bin:/usr/bin:/home/acb11655gd/.local/bin
+SHELL VARIABLE: shell
+ENVIRONMENTAL VARIABLE: environment
+PID/BASHPID/PPID: 77801/77801/74905
+
+ZSH
+PATH: /tmp/3782407.1.gpu:/usr/local/bin:/bin:/usr/bin:/home/acb11655gd/.local/bin
+SHELL VARIABLE: 
+ENVIRONMENTAL VARIABLE: environment
+PID/BASHPID/PPID: 77802//77801
+1 2 3
+
+BASH
+PATH: /tmp/3782407.1.gpu:/usr/local/bin:/bin:/usr/bin:/home/acb11655gd/.local/bin
+SHELL VARIABLE: 
+ENVIRONMENTAL VARIABLE: environment
+PID/BASHPID/PPID: 77809/77809/77801
+1 2 3
