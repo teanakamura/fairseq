@@ -53,6 +53,7 @@ OPTIONAL_ARGS=(
    --clip-norm ${CONF[clip_norm]}
    --max-update ${CONF[update_max]}
    --max-epoch ${CONF[max_epoch]}
+   --max-update ${CONF[update_max]}
    --skip-invalid-size-inputs-valid-test
    --user-dir ${USER_DIR}
    --keep-last-epochs ${CONF[keep_last_epochs]}
