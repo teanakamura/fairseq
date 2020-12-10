@@ -194,7 +194,6 @@ class TransformerConModel(FairseqEncoderDecoderModel):
             return emb
 
         if args.share_all_embeddings:
-            print('ERROR!!!!!!!!!!!!')
             if src_dict != tgt_dict:
                 raise ValueError('--share-all-embeddings requires a joined dictionary')
             if args.encoder_embed_dim != args.decoder_embed_dim:
@@ -215,9 +214,9 @@ class TransformerConModel(FairseqEncoderDecoderModel):
             decoder_embed_tokens = build_embedding(
                 tgt_dict, args.decoder_embed_dim, args.decoder_embed_path
             )
-        embed_additional_tokens = build_embedding(
-            add_dict, 1, None
-        )
+            embed_additional_tokens = build_embedding(
+                add_dict, 1, None
+            )
 
         encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, embed_additional_tokens)
         decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens)

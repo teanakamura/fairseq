@@ -214,9 +214,9 @@ class TransformerSumModel(FairseqEncoderDecoderModel):
             decoder_embed_tokens = build_embedding(
                 tgt_dict, args.decoder_embed_dim, args.decoder_embed_path
             )
-            embed_additional_tokens = build_embedding(
-                add_dict, args.encoder_embed_dim, None
-            )
+        embed_additional_tokens = build_embedding(
+            add_dict, args.encoder_embed_dim, None
+        )
 
         encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, embed_additional_tokens)
         decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens)

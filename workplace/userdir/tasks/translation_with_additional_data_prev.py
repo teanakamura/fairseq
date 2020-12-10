@@ -18,21 +18,9 @@ from fairseq.data import (
     TruncateDataset,
 )
 # from userdir.data import LanguagePairWithAdditionalDataDataset
+from fairseq.data import LanguagePairWithAdditionalDataDataset
 
 from fairseq.tasks import FairseqTask, register_task
-
-def add_user_module(module_path, package=None):
-    if module_path is not None:
-        module_path = os.path.abspath(module_path)
-        if not os.path.exists(module_path):
-            fairseq_rel_path = os.path.join(os.path.dirname(__file__), '..', module_path)
-            if os.path.exists(fairseq_rel_path):
-                module_path = fairseq_rel_path
-        module_parent, module_name = os.path.split(module_path)
-        import sys
-        if module_parent not in sys.path:
-            print(module_parent, module_name)
-            sys.path.insert(0, module_parent)
 
 
 def load_langpair_with_additional_data_dataset(
@@ -43,8 +31,7 @@ def load_langpair_with_additional_data_dataset(
     left_pad_source, left_pad_target, max_source_positions,
     max_target_positions, prepend_bos=False, load_alignments=False,
     truncate_source=False,
-    add_dir=None, add_lang=None, add_dict=None,
-    userdirname=None,
+    additional_data=None, add_dict=None,
 ):
     def split_exists(split, src, tgt, lang, data_path):
         filename = os.path.join(data_path, '{}.{}-{}.{}'.format(split, src, tgt, lang))
@@ -112,7 +99,8 @@ def load_langpair_with_additional_data_dataset(
 
     for k in itertools.count():
         split_k = split + (str(k) if k > 0 else '')
-        additional_data_path = f'{data_path}/{add_dir}'
+        add_lang = 'add'
+        additional_data_path = f'{data_path}/additional_data'
 
         # infer langcode
         if split_exists(split_k, add_lang, 'None', add_lang, additional_data_path):
@@ -149,10 +137,7 @@ def load_langpair_with_additional_data_dataset(
         # tgt_dataset = ConcatDataset(tgt_datasets, sample_ratios)
 
     if add_dataset:
-        import sys
-        module_parent, module_name = os.path.split(os.path.abspath(userdirname))
-        add_user_module(userdirname)
-        return sys.modules[module_name].data.LanguagePairWithAdditionalDataDataset(
+        return LanguagePairWithAdditionalDataDataset(
             src_dataset, src_dataset.sizes, src_dict,
             tgt_dataset, tgt_dataset.sizes, tgt_dict,
             add_dataset, add_dataset.sizes, add_dict,
@@ -224,8 +209,7 @@ class TranslationWithAdditionalDataTask(FairseqTask):
                             help='amount to upsample primary dataset')
         parser.add_argument('--truncate-source', default=False, action='store_true',
                             help='boolean to truncate source to max-source-positions')
-        parser.add_argument('--add-dir', default=None)
-        parser.add_argument('--add-lang', default=None)
+        parser.add_argument('--additional-data', default=None)
         # fmt: on
 
     def __init__(self, args, src_dict, tgt_dict, add_dict):
@@ -267,7 +251,8 @@ class TranslationWithAdditionalDataTask(FairseqTask):
         print('| [{}] dictionary: {} types'.format(args.source_lang, len(src_dict)))
         print('| [{}] dictionary: {} types'.format(args.target_lang, len(tgt_dict)))
 
-        add_dict = cls.load_dictionary(os.path.join('{}/{}'.format(paths[0], args.add_dir), 'dict.{}.txt'.format(args.add_lang)))
+        # add_dict = cls.load_dictionary(os.path.join(paths[0], 'additional_data', 'dict.{}.txt'.format(args.add_lang)))
+        add_dict = cls.load_dictionary(os.path.join(paths[0], 'additional_data', 'dict.add.txt'))
         return cls(args, src_dict, tgt_dict, add_dict)
 
     def load_dataset(self, split, epoch=0, combine=False, **kwargs):
@@ -293,9 +278,8 @@ class TranslationWithAdditionalDataTask(FairseqTask):
             max_target_positions=self.args.max_target_positions,
             load_alignments=self.args.load_alignments,
             truncate_source=self.args.truncate_source,
-            add_dir=self.args.add_dir,
-            add_lang=self.args.add_lang, add_dict=self.add_dict,
-            userdirname=getattr(self.args, 'user_dir', None),
+            additional_data=self.args.additional_data,
+            add_dict=self.add_dict,
         )
 
     def build_dataset_for_inference(self, src_tokens, src_lengths):

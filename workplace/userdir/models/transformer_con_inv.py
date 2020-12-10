@@ -32,8 +32,8 @@ DEFAULT_MAX_SOURCE_POSITIONS = 1024
 DEFAULT_MAX_TARGET_POSITIONS = 1024
 
 
-@register_model('transformer_con')
-class TransformerConModel(FairseqEncoderDecoderModel):
+@register_model('transformer_con_inv')
+class TransformerConInvModel(FairseqEncoderDecoderModel):
     """
     Transformer model from `"Attention Is All You Need" (Vaswani, et al, 2017)
     <https://arxiv.org/abs/1706.03762>`_.
@@ -194,7 +194,6 @@ class TransformerConModel(FairseqEncoderDecoderModel):
             return emb
 
         if args.share_all_embeddings:
-            print('ERROR!!!!!!!!!!!!')
             if src_dict != tgt_dict:
                 raise ValueError('--share-all-embeddings requires a joined dictionary')
             if args.encoder_embed_dim != args.decoder_embed_dim:
@@ -215,9 +214,9 @@ class TransformerConModel(FairseqEncoderDecoderModel):
             decoder_embed_tokens = build_embedding(
                 tgt_dict, args.decoder_embed_dim, args.decoder_embed_path
             )
-        embed_additional_tokens = build_embedding(
-            add_dict, 1, None
-        )
+            embed_additional_tokens = build_embedding(
+                add_dict, 1, None
+            )
 
         encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, embed_additional_tokens)
         decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens)
@@ -361,7 +360,7 @@ class TransformerEncoder(FairseqEncoder):
         # embed tokens and positions
         # x = embed = self.embed_scale * self.embed_tokens(src_tokens)
         a = self.embed_tokens(src_tokens)
-        b = self.embed_add_tokens(add_tokens)
+        b = self.embed_add_tokens(add_tokens) * 0
         x = embed = self.embed_scale * torch.cat([a, b], dim=-1)
         if self.embed_positions is not None:
             x = embed + self.embed_positions(src_tokens)
@@ -791,7 +790,7 @@ def Linear(in_features, out_features, bias=True):
     return m
 
 
-@register_model_architecture('transformer_con', 'transformer_con')
+@register_model_architecture('transformer_con_inv', 'transformer_con_inv')
 def base_architecture(args):
     args.encoder_embed_path = getattr(args, 'encoder_embed_path', None)
     args.encoder_embed_dim = getattr(args, 'encoder_embed_dim', 512)
