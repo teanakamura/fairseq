@@ -7,34 +7,25 @@ from collections import defaultdict
 #from utils import process_bpe_symbol
 import os
 import sys
-import yaml
-from attrdict import AttrDict
-
 
 FAIRSEQ_ROOT=f'{os.environ["HOME"]}/fairseq'
 USER_DIR='/fs1/groups1/gcb50243/nakamura'
 DATA_ROOT=f'{os.environ["HOME"]}/data'
 
-# def read_config(config):
-#     conf = dict()
-#     with open(f'{FAIRSEQ_ROOT}/workplace/script/configs/{config}') as f:
-#         for l in f:
-#             l = l.strip()
-#             if l:
-#                 k, v = l.split('=')
-#                 conf[k] = v
-#     print(conf)
-#     return conf
+def read_config(config):
+    conf = dict()
+    with open(f'{FAIRSEQ_ROOT}/workplace/script/configs/{config}') as f:
+        for l in f:
+            l = l.strip()
+            if l:
+                k, v = l.split('=')
+                conf[k] = v
+    print(conf)
+    return conf
 
 print(FAIRSEQ_ROOT)
 print(USER_DIR)
 
-def deepupdate(dict_base, other):
-  for k, v in other.items():
-    if isinstance(v, dict) and k in dict_base:
-      deepupdate(dict_base[k], v)
-    else:
-      dict_base[k] = v
 
 def read_file(filename, bpe_symbol=None):
   with open(filename) as f:
@@ -96,7 +87,6 @@ class KeywordRemover():
         return ' '.join(res)
 
 def main(args):
-    id_list = []
     rougeone_list = []
     rougetwo_list = []
     rougel_list = []
@@ -111,21 +101,12 @@ def main(args):
             if args.keyword:
                 so = kr(so)
                 re = kr(re)
-            else:
-                idx, so = so.split(None, 1)
-                idx, re = re.split(None, 1)
-            id_list.append(int(idx))
             rougeone_list.append(rouge4one.rouge_1(summary=so, references=re, alpha=args.alpha))
             rougetwo_list.append(rouge4other.rouge_2(summary=so, references=re, alpha=args.alpha))
             rougel_list.append(rouge4one.rouge_l(summary=so, references=re, alpha=args.alpha))
-    lowest_idids = np.argpartition(rougeone_list, 100)[:100]
-    print(f"Lowest IDs\t{' '.join(map(str, np.array(id_list)[lowest_idids]))}")
     print('ROUGE-1\t%.6f'%(np.average(rougeone_list)))
     print('ROUGE-2\t%.6f'%(np.average(rougetwo_list)))
     print('ROUGE-L\t%.6f'%(np.average(rougel_list)))
-    with open(args.output, 'w') as of:
-        for idx, r1, r2, rl in zip(id_list, rougeone_list, rougetwo_list, rougel_list):
-            of.write(f'{idx}, {r1}, {r2}, {rl}\n')
   
    # system_out_list = read_file(args.system_out, args.remove_bpe)
    # reference_list = read_file(args.reference, args.remove_bpe)
@@ -147,44 +128,19 @@ def parse():
     parser.add_argument('-r', '--reference', dest='reference',
         default=None,
         help='specify the reference file name')
-    parser.add_argument('-o', '--output', default=None)
     parser.add_argument('-l', '--lang', default='en')
     parser.add_argument('--alpha', type=float, default=0.5)
     parser.add_argument('--remove-bpe', default=None)
-    parser.add_argument('-y', '--yaml', required=True)
-    parser.add_argument('-k', '--keyword', default=f'{DATA_ROOT}/cnndm-pj/test_sumfilter.txt')
-    parser.add_argument('-d', '--data', required=True)
+    parser.add_argument('config')
+    parser.add_argument('-k', '--keyword', default=f'{DATA_ROOT}/test_sumfilter.txt')
     return parser.parse_args()
 
-def load_yaml(args):
-    yaml_root_path = f'{FAIRSEQ_ROOT}/workplace/script/yaml_configs'
-    conf = yaml.safe_load(open(f'{yaml_root_path}/default.yml'))
-    if os.path.isfile(f'{yaml_root_path}/{args.data}/default.yml'):
-        deepupdate(conf, yaml.safe_load(open(f'{yaml_root_path}/{args.data}/default.yml')))
-    deepupdate(conf, yaml.safe_load(open(f'{yaml_root_path}/{args.data}/{args.yaml}')))
-    return AttrDict(conf)
 
 if __name__ == "__main__":
     args = parse()
-    conf = load_yaml(args)
-    # args = parse()
-    # conf_path = f'{FAIRSEQ_ROOT}/workplace/script/yaml_configs/default.yml'
-    # conf = yaml.safe_load(open(conf_path))
-    # conf_path = f'{FAIRSEQ_ROOT}/workplace/script/yaml_configs/{args.data}/default.yml'
-    # conf_add = yaml.safe_load(open(conf_path))
-    # deepupdate(conf, conf_add)
-    # conf_path = f'{FAIRSEQ_ROOT}/workplace/script/yaml_configs/{args.data}/{args.config}'
-    # conf_add = yaml.safe_load(open(conf_path))
-    # deepupdate(conf, conf_add)
-
-    # data = conf.get('gen_data') or conf['data']
-    # gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{data}/{conf["model"]}{conf["checkpoint"]}'
-    gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{conf.data.name}/{conf.data.type}/{conf.model.name}{conf.checkpoint}'
-    print(gen_path)
-    if conf.get('gen_data'):
-        gen_path += f'/{conf.get("gen_data")}'
-    args.system_out = args.system_out or f'{gen_path}/system_output.{conf.rouge.suf}'
-    args.reference = args.reference or f'{gen_path}/reference.{conf.rouge.suf}'
-    args.output = args.output or f'{gen_path}/rougeout.txt'
-    args.lang = conf.rouge.lang
+    conf = read_config(args.config)
+    data = conf.get('gen_data') or conf['data']
+    gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{data}/{conf["model"]}{conf["checkpoint"]}'
+    args.system_out = args.system_out or f'{gen_path}/system_output.txt'
+    args.reference = args.reference or f'{gen_path}/reference.txt'
     main(args)

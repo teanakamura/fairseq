@@ -150,8 +150,11 @@ def parse():
 if __name__ == "__main__":
     args = parse()
     conf = read_config(args.config)
-    data = conf.get('gen_data') or conf['data']
-    gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{data}/{conf["model"]}{conf["checkpoint"]}'
+    # data = conf.get('gen_data') or conf['data']
+    # gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{data}/{conf["model"]}{conf["checkpoint"]}'
+    gen_path = f'{FAIRSEQ_ROOT}/workplace/generation/{conf["data"]}/{conf["model"]}{conf["checkpoint"]}'
+    if conf.get('gen_data'):
+        gen_path += f'/{conf.get("gen_data")}'
     args.system_out = args.system_out or f'{gen_path}/system_output.txt'
     args.reference = args.reference or f'{gen_path}/reference.txt'
     args.output = args.output or f'{gen_path}/rougeout.txt'
