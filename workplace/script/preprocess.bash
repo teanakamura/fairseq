@@ -60,13 +60,13 @@ if check_exec_shell 'bash'; then
       --joined-dictionary
     )
   elif $FLAG_A && $FLAG_T; then
-    DICT_DIR=${DEST_DIR}
+    DICT_DIR=${DEST_DIR}/${dest_add_dir:-additional_data}
     DEST_DIR=${DEST_DIR}/${external_test_dir}/${dest_add_dir:-additional_data}
     OPTIONAL_ARGS=(
       "${OPTIONAL_ARGS[@]}"
       --testpref $DATA_DIR/test
       --destdir $DEST_DIR
-      --srcdict $DICT_DIR/dict.${lang_src}.txt
+      --srcdict $DICT_DIR/dict.${lang_add}.txt
       --source-lang $lang_add
       --only-source
     )
